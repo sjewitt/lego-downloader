@@ -1,0 +1,5 @@
+from legoPlansClass import LegoPlans
+
+plans = LegoPlans()
+
+print(plans.loadPlans())

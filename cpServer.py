@@ -1,11 +1,18 @@
-import json
 import cherrypy
 import os
-# from cherrypy import tools
-from legoPlansClass import LegoPlans,LegoPlansUI
+from legoPlans import LegoPlans
+from legoPlansUI import LegoPlansUI
+
+'''
+Simple REST-based utility to list and download Lego plans using the API at https://brickset.com/exportscripts/instructions.
+
+ - The CherryPy server start, defining URL roots for REST API and user interface.
+'''
 
 def error_page_404(status, message, traceback, version):
     return "404 Error!"
+
+
 
 def start_server():
     root_dir = os.path.abspath( os.path.dirname(__file__))
@@ -17,7 +24,6 @@ def start_server():
         '/static' : {
             'tools.staticdir.on'    : True,
             'tools.staticdir.dir'   : os.path.join(os.getcwd(), 'static'),
-#             'tools.staticdir.index' : 'index.html',
             'tools.gzip.on'         : True  
         }  
     }    

@@ -1,0 +1,7 @@
+from legoPlansClass import LegoPlans
+
+plans = LegoPlans()
+
+print(plans.planData)
+
+requests.post('http://localhost:9090/GetStates', json={'filter': 'calif'})

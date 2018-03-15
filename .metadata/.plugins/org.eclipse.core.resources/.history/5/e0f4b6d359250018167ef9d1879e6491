@@ -1,0 +1,51 @@
+from urllib import request
+import json
+# import csv
+# from collections import OrderedDict
+import cherrypy
+from cherrypy import tools
+
+class LegoPlans():
+    
+    _sourceUrl = 'https://brickset.com/exportscripts/instructions'
+    planData = []
+    planDataLoaded = False
+
+
+    def __init__(self):
+        print('bootstrapping...')
+        self.loadPlans()
+    
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    @cherrypy.tools.json_in()
+    def default(self):
+        return({'default':'func'})
+        
+
+    #issues with DictReader - kept getting single characters for headers, and inconsistent row sizes.
+    #possily also issues as there are {} characters which may be causing parsing problems as well.
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    @cherrypy.tools.json_in()
+    def loadPlans(self):
+        print('loading source plans from ' + self._sourceUrl)
+        _out = request.urlopen(self._sourceUrl)
+        _content = _out.read().decode()
+        _reader = _content.split('\r\n')
+        _headers = _reader[0].split(',')
+        _reader.pop(0)
+        for row in _reader:
+            _row = row.split(',')
+            if len(_row) >= 5:
+                _rowData = {_headers[0]:_row[0].strip(),_headers[1]:_row[1],_headers[2]:_row[2],_headers[3]:_row[3],_headers[4]:_row[4]}
+                self.planData.append(_rowData)
+        
+        self.planDataLoaded = True
+        
+        return(self.plansLoaded())
+    
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def plansLoaded(self):
+        return({'planDataLoaded':self.planDataLoaded})

@@ -1,0 +1,13 @@
+INSTUPlegoPlansClass
+C:\Work\LiClipse\test\Lego Plan Downloader\legoPlansClass.py
+INFOS:&&1|1|2|0&&3|3|2|1&&3|4|2|1&&3|5|2|1&&2|6|2|1&&2|7|2|1&&2|8|2|1&&3|5|2|9&&2|10|2|1
+_sourceUrl=3
+plansLoaded=10
+default=7
+LegoPlans=1
+legoPlansClass=2
+loadPlans=8
+planData=4
+planDataLoaded=5
+__init__=6
+LegoPlans.loadPlans=9

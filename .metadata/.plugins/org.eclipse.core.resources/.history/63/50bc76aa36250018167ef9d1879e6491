@@ -1,0 +1,42 @@
+from urllib import request
+from csv import reader
+from csv import DictReader
+from collections import OrderedDict
+
+
+class LegoPlans():
+    
+    _sourceUrl = 'https://brickset.com/exportscripts/instructions'
+    planData = []
+    planDataTest = []
+
+    def __init__(self):
+        print('bootstrapping...')
+        self.loadPlansTest()
+        self.loadPlans()
+
+    def loadPlansTest(self):
+        print('loading test CSV file')
+
+        _reader = DictReader(open('test.csv'))#.read()).decode())  #odereddict to list
+        for row in _reader:
+#             https://stackoverflow.com/questions/6740918/creating-a-dictionary-from-a-csv-file
+            self.planDataTest.append(dict(row))
+
+
+
+    def loadPlans(self):
+        print('loading source plans from ' + self._sourceUrl)
+        response = request.urlopen(self._sourceUrl)
+        
+#         response_encoding = response.headers.get_param('charset')
+#         print(_out.read().decode())
+#         _reader = DictReader((response.read()).decode(),dialect='excel')  #odereddict to list
+        _reader = reader(response)  #odereddict to list
+#         _reader2 = reader(_out)  #odereddict to list
+        for row in _reader:
+
+#             https://stackoverflow.com/questions/6740918/creating-a-dictionary-from-a-csv-file
+#             print(dict(row))
+            self.planData.append(dict(row))
+#         self.planData = _csv.

@@ -1,0 +1,31 @@
+-- VERSION_4
+-- START DISKCACHE_2
+C:\Work\LiClipse\test\.metadata\.plugins\org.eclipse.core.resources\.projects\Lego Plan Downloader\com.python.pydev.analysis\v2_indexcache
+cpServer|1520791371287476000|C:\Work\LiClipse\test\Lego Plan Downloader\cpServer.py
+start|1520782114814186000|C:\Work\LiClipse\test\Lego Plan Downloader\start.py
+-- END DISKCACHE
+-- START DICTIONARY
+3
+1=cpServer
+3=HomeController
+2=start
+-- END DICTIONARY
+-- START TREE 1
+6
+_re|0|
+err|1|error_page_404!10@
+hom|1|HomeController!9@
+leg|0|
+pla|1|plans!19@
+sta|1|start_server!10@
+-- END TREE
+-- START TREE 2
+7
+__i|0|
+_pl|0|
+_so|0|
+def|0|
+get|1|GetStates!3&10@
+loa|0|
+pla|0|
+-- END TREE

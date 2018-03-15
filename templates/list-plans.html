@@ -1,52 +1,50 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Treecreeper 2 - Copy an existing Treecreep definition</title>
+        <title>LEGO plans downloader</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <!--<link href="/static/css/fonts.css" rel="stylesheet" type="text/css"/>-->
+<!--        <link href="/static/css/fonts.css" rel="stylesheet" type="text/css"/>-->
         <link href="/static/js/libs/pure/base.css" rel="stylesheet" type="text/css"/>
         <link href="/static/js/libs/pure/grids-core.css" rel="stylesheet" type="text/css"/>
-        <link href="/static/js/libs/pure/forms.css" rel="stylesheet" type="text/css"/>
-        <link href="/static/js/libs/pure/buttons.css" rel="stylesheet" type="text/css"/>
         <link href="/static/js/libs/pure/grids-units.css" rel="stylesheet" type="text/css"/>
         <link href="/static/js/libs/jqueryui/jquery-ui.css" rel="stylesheet" type="text/css"/>
         <link href="/static/js/libs/jqueryui/jquery-ui.structure.css" rel="stylesheet" type="text/css"/>
         <link href="/static/js/libs/jqueryui/jquery-ui.theme.css" rel="stylesheet" type="text/css"/>
+        <link href="/static/js/libs/datatables/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css"/>
         <link href="/static/css/styles.css" rel="stylesheet" type="text/css"/>
         
         <link rel="icon" type="image/ico" href="/static/favicon.ico" />
         <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
     </head>
     <body>
-
-        <div class="bc"><a href="/">Home</a> > Copy an existing Treecreep definition</div>
+      
         <div class="wrapper">
+            <div class="pure-g">
+                <div class="pure-u-2-3">
+                    <h1>LEGO plans downloader</h1>
+                </div>
+            </div>
             
             <div class="pure-g">
-                <div class="pure-u-1-5"></div>
-                <div class="pure-u-3-5">
-                    <h1>Copy an existing Treecreep definition</h1>
-                    <span>Select definition to copy: </span><select id="definition_dropdown" class="pure-input-1-2"></select>    
-                    <!-- this writes back to DB, with auto-renaming -->
-                    <h2>Copy</h2>
-                    <p>Copy selected definition. The customer name and treecreep name will be suffixed with a unique string based on the date and time. Please amend these to suit your requirements.</p>
-                    <div><input type="button" id="copy_definition" value="Copy selected" class="pure-button"></div>
-                    <div id="copyresult">LINK BACK TO MANAGE, WITH COPIED ITEM SELECTED - REDIRECT AUTO</div>
+                <div class="pure-u-1" id="plans_list">
+     
                 </div>
-                <div class="pure-u-1-5"></div>
             </div>
         </div>
+        
         <div id="ajax-loading" style="display:none">
             AJAX call in progress. Please wait.
         </div>
+
         <script src="/static/js/libs/jquery/jquery.js" type="text/javascript"></script>
         <script src="/static/js/libs/jquery/jquery.cookie.js" type="text/javascript"></script>
         <script src="/static/js/libs/jqueryui/jquery-ui.js" type="text/javascript"></script>
+        <script src="/static/js/libs/datatables/js/jquery.dataTables.min.js" type="text/javascript"></script>
         <script src="/static/js/engine.js" type="text/javascript"></script>
         <script>
-           	engine.init();
-        </script>        
+            engine.init();
+        </script>
         
     </body>
 </html>
