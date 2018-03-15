@@ -1,0 +1,818 @@
+/* 
+Styles for Fetch Service monitoring UI 
+*/
+input.btn{
+    width:110px;
+    margin-left:5px;
+}
+
+.body{
+    padding:20px;
+}
+.row{
+    padding-top:10px;
+    padding-bottom:10px;
+}
+.options{
+    /*width:160px;*/
+}
+.actions{
+    width:110px;
+}
+.actions.input{
+    padding:5px;
+}
+.fixedcol{
+    width:320px;
+}
+
+.buttonwrapper{
+    width:112px;
+    vertical-align:bottom;
+}
+
+#scrapes{
+    height:150px;
+}    
+
+.table-container{
+/*    height:150px;
+    overflow:auto;
+    border:1px solid #999;*/
+}
+
+/* overrides */
+.pure-table{
+    width:100%;
+
+}
+
+div#filters > select{
+    width:100%;
+}
+
+div#progressbar{
+    display:none;
+}
+
+div#progressbar div#done{
+    background-color: #009933;
+    padding-top:2px;
+    padding-bottom:2px;
+    
+}
+div#progressbar div#notdone{
+    background-color: #b94a48;
+    padding-top:2px;
+    padding-bottom:2px;
+}
+
+h3#progresstitle{
+    margin-top:0px;
+}
+
+
+/* Start page. emphasize the primary task: */
+ul.tasks{
+    list-style-type: none;
+}
+
+ul.tasks > li > a{
+    text-decoration: none;
+}
+ul.tasks > li:hover{
+    text-decoration: underline;
+    list-style-type:disc;
+}
+
+ul.tasks > li{
+    /*padding-bottom: 20px;*/
+    
+}
+
+ul.tasks > li.primary-task{
+    font-size:18pt;
+    
+}
+
+.highlight{
+    font-weight:bold;
+}
+
+.wrapper{
+    padding: 50px;
+    padding-top:0px;
+}
+
+div.form > div.pure-g{
+    padding-top:10px;
+}
+
+.bc{
+    padding:10px;
+    background-color: #ddd;
+}
+
+#lang_radio {
+    float:left;
+}
+#lang_radio input {
+    margin-right:5px;
+}
+
+#allfacets > select{
+    /*margin-left:20px;*/
+    width:250px;
+}
+img#spinner{
+    
+}
+
+#allfacets{
+    display:none;
+}
+
+#nomatch_button{
+    font-size: initial;
+    font-weight: initial;
+    margin-left:7px;
+}
+#facet_mapper_ui{
+    visibility: hidden;
+}
+
+#unlockfacetstable{
+    width:100%;
+}
+
+#unlockfacetstable > thead > tr > td ,#unlockfacetstable > tfoot > tr > td{
+    font-weight:bold;
+    background-color:#999;
+    padding:5px;
+}
+
+#unlockfacetstable > tbody > tr{
+    border-top:1px solid #999;
+}
+
+#unlockfacetstable > tbody > tr > td{
+    padding:5px;
+}
+
+#unlockfacetstable > tbody > tr > td > input{
+    margin-right:5px;
+}
+ul.response-icons{
+    padding-left:0px;
+}
+ul.response-icons > li{
+    display:inline-block;
+    float:left;
+    border: 1px dashed black;
+    margin-right: 5px;
+}
+div.response-icon{
+    float:left;
+    display:inline-block;
+    width:85px;
+    height:85px;
+    background-image: url(/static/images/smileys.png);
+}
+
+div.response-icon-path{
+    float:left;
+    display:inline-block;
+    width:85px;
+    height:85px;
+    background-image: url(/static/images/path.png);
+    background-size:contain;
+}
+
+div.response-icon.response-yes{
+    
+    background-position-x: 710px;
+}
+div.response-icon.response-maybe{
+    background-position-x: 621px;
+    background-position-y: 85px;
+}
+div.response-icon.response-no{
+    background-position-x: 532px;
+}
+div.response-icon.response-path{
+    background-position-y: 85px;
+    background-position-x: -89px;
+}
+
+div.response-icon-sml{
+    float:right;
+    display:inline-block;
+    background-image: url(/static/images/smileys-sml.png);
+    width:23px;
+    height:21px;
+    margin-right:10px;
+    cursor:pointer;
+}
+
+div.response-icon-sml > img{
+width:100%
+}
+div.response-icon-sml.response-yes{
+    background-position-x: 178px;
+}
+div.response-icon-sml.response-maybe{
+    background-position-x: 156px;
+    background-position-y: 87px;
+}
+div.response-icon-sml.response-no{
+    background-position-x: 133px;
+}
+div.response-icon-sml.response-pathed{
+    background-position-y: 21px;
+    background-position-x: -22px;
+}
+
+div#currentdomain > span{
+    font-weight:bold;
+}
+
+div#domain-history > ul > li.header{
+    padding: 5px;
+
+}
+div#domain-history > ul > li.header > div{
+    display:inline-block;
+    float:right;
+}
+
+div#domain-history > ul > li.header span{
+    font-size: 14pt;
+    font-weight:bold;
+}
+div#domain-history > ul > li.header > div > span{
+    padding-right:63px;
+}
+
+div#domain-history > ul{
+    list-style-type: none;
+    padding-left:0px;
+    padding:5px;
+    border:1px solid #aaa;
+}
+
+
+
+div#domain-history > ul > li{
+    height:23px;
+}
+div#domain-history > ul > li.odd{
+    background-color:#eee;
+}
+div#domain-history > ul > li.even{
+    background-color:#f6f6f6;
+}
+
+div#domain-history > ul > li > a{
+    text-decoration: none;
+}
+div#domain-history > ul > li > a:hover{
+    text-decoration: underline;
+}
+
+/* Hide the markup for the diaogue */
+#domain-paths{
+	
+}
+#msgbox{
+    margin:10px;
+    padding:0px;
+    border:1px dashed grey;
+    width: 341px;
+    overflow:hidden;
+    height:0px;
+    position: absolute;
+    z-index: 10;
+    background-color: aliceblue;
+    top: 272px;
+    left: 40px;
+}
+/* over-ride initial position for admin review page */
+div#msgbox.admintasks{
+    left: -4000px;
+}
+
+#msgbox-closer{
+    float: right;
+    border: 1px solid black;
+    width: 15px;
+    height: 15px;
+    text-align: center;
+}
+
+#msgbox-closer:hover{
+    cursor:pointer;
+}
+
+/*
+#msgbox > ul > li:first-of-type{
+    font-weight: bold;
+}*/
+
+/*#msg-content{
+    display:none;
+}*/
+
+.hidden{
+    display:none;
+}
+
+.emp{
+    font-weight: bold;
+    padding-top:10px;
+    padding-bottom:5px;
+    
+}
+
+/*
+height: 200px;
+    padding: 10px;
+    position: fixed;
+    z-index: 10;
+    background-color: aliceblue;
+    top: 248px;
+    left: 40px;
+*/
+
+/* Admin stuff */
+#msgbox-admin{
+    margin:10px;
+    padding:0px;
+    /*border:1px dashed grey;*/
+    width: 400px;
+    overflow:hidden;
+/*    height:0px;
+    position: absolute;
+    z-index: 10;*/
+    background-color: aliceblue;
+/*    top: 358px;
+    left: 40px;*/
+}
+
+
+#moredomains{
+    width: 100%;
+    height: 300px;
+}
+
+/* wrapper for loading indicators */
+.spinner{
+    position:relative;
+    width:100%;
+    height:100%;
+    text-align: center;
+    vertical-align: middle;
+}
+.spinner.pendingtext{
+    font-size: 18pt;
+}
+a.resetdomain > img{
+    width:15%;
+}
+
+/* 
+master table list 
+see https://datatables.net/forums/discussion/30530/set-fixed-column-width
+*/
+#domains-admin{
+    table-layout: fixed;
+    word-wrap:break-word;
+}
+
+#domain-admin-filter input{
+    padding:5px;
+}
+#back-to-filter{
+    padding-bottom: 10px;
+    font-weight:bold;
+}
+
+/*#apply-filter{
+    color:#999;
+}*/
+
+/* Row highlighter */
+table#domains-admin > thead > tr, table#domains-admin > tfoot > tr{
+    background-color: powderblue;
+}
+
+table#domains-admin > tbody > tr.even{
+    background-color: #eee;
+}
+table#domains-admin > tbody > tr.odd{
+    background-color: #f6f6f6;
+}
+
+/* make an elemen text look like a link */
+.fakelink{
+    color:darkblue;
+    cursor:pointer;
+}
+.fakelink:hover{
+    text-decoration: underline;
+}
+
+/*
+Navbar stuff, concept taken from Tonto
+*/
+.divider{
+    border-bottom:1px solid #777;
+}
+
+.navbar{
+    height:44px;
+    background-color: #bbb;
+}
+.navicon{
+    display:inline-block;
+    width:24px;
+    height:24px;
+    margin: 10px;
+    margin-right:5px;
+    margin-left:5px;
+    cursor:pointer;
+} 
+.navicon_left{
+    float:left;
+}
+.navicon_right{
+    float:right;
+}
+/* icons */
+.user{
+    background-image: url(/static/images/icons/user-shape_24.png);
+    cursor:default;    
+}
+.username{
+    width: auto;
+    margin-top:5px;
+    cursor:default;   
+}
+.currproject{
+    width: auto;
+    cursor:default;   
+    font-size: 14pt;
+    padding-top: 2px;
+    padding-right: 5px;
+}
+
+
+
+
+
+/* menubar */
+div.manage_queue{
+    background-image: url(/static/images/icons/load_24.png);
+}
+div.create_new_config{
+    background-image: url(/static/images/icons/add_24_trans.png); /* find better one */
+    background-size: contain;
+}
+div.copy_config{
+    background-image: url(/static/images/icons/icon_duplicate_24_trans.png);
+}
+div.edit_config{
+    background-image: url(/static/images/icons/cog-wheel_24.png);
+}
+
+div.manage_plugins{
+    background-image: url(/static/images/icons/icon_plugin_24_trans.png);
+}
+
+div.retrieve_data{
+    background-image: url(/static/images/icons/icon_download_24_trans.png);
+}
+
+
+
+
+
+
+
+
+/* index page bullets */
+/* manage */
+li.bullet_load{
+    list-style-image: url(/static/images/icons/load_24.png);
+}
+/* GREEN plus create new */
+li.bullet_redplus{
+    list-style-image: url(/static/images/icons/add_24_trans.png); /* find better one */
+}
+/* copy */
+li.bullet_copy{
+    list-style-image: url(/static/images/icons/icon_duplicate_24_trans.png); 
+}
+/* edit */
+li.bullet_cog{
+    list-style-image: url(/static/images/icons/cog-wheel_24.png);
+}
+/* plugin */
+li.bullet_plugin{
+    list-style-image: url(/static/images/icons/icon_plugin_24_trans.png); /* find better one */
+}
+/* download data */
+li.bullet_download{
+    list-style-image: url(/static/images/icons/icon_download_24_trans.png); /* find better one */
+}
+
+/*li.bullet_ribbon{
+    list-style-image: url(/static/images/icons/ribbon_black_24.png);  find better one 
+}*/
+
+
+/*li.bullet_nodes{
+    list-style-image: url(/static/images/icons/nodes-tree_24.png);
+}*/
+/*li.bullet_save{
+    list-style-image: url(/static/images/icons/save_black_24.png);
+}*/
+
+/*li.bullet_spanner{
+    list-style-image: url(/static/images/icons/spanner_black_24.png);
+}*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+div.projectvars div{
+    padding-top:10px;
+}
+div.projectvars input{
+    margin-right:10px;
+}
+div.projectvars span.summary{
+    padding-left:10px;
+    color:#888;
+    font-style: italic;
+}
+
+div.pure-u-1.projectvars{
+    padding-bottom:20px;
+}
+
+/* jquery UI overrides */
+/* See https://stackoverflow.com/questions/5583995/set-jquery-ui-modal-dialog-overlay-background-color */
+.ui-widget-overlay
+{
+  opacity: .70 !important; /* Make sure to change both of these, as IE only sees the second one */
+  filter: Alpha(Opacity=70) !important;
+  background-color: rgb(50, 50, 50) !important; /* This will make it darker */
+}
+
+.ui-tooltip{
+    max-width:500px;
+}
+
+
+
+/* DT overrides */
+#dt_table tr > th{
+    text-align: left;
+}
+
+#dt_table td.islink{
+   /* cursor:pointer; */ 
+}
+
+
+#dt_table td.islink:hover{
+    text-decoration:underline;  
+}
+
+#dt_table td.islink > div.editspot{
+	/* not positioned quite right, so over-ride here */
+	background-position-y: 3px;
+}
+
+#dt_table td:nth-of-type(1),#dt_table td:nth-of-type(2){
+    cursor:default;
+}
+
+
+#tabs-1 input{
+    width:100%;
+}
+
+#tabs-2 input[type=button]{
+    width:100%;
+}
+
+#editor-tabs input{
+    padding:5px;
+    margin:10px;
+}
+
+#editor-tabs div.advanced_params input[type=text]{
+    width:95%; 
+}
+
+#editor-tabs div.advanced_params input[type=text].smallfield{
+    width:20%; 
+}
+
+#editor-tabs div.advanced_params > div > div > div.pure-u-1-4.pad{
+    padding-top:10px;
+}
+
+div.togglewrapper{
+    display:none;
+    padding-left:25px;
+/*    border:1px solid gray;
+    padding:15px;*/
+}
+
+
+div.pt{
+    font-weight:bold;
+}
+div.pt > pre,td.pt > pre{
+    font-weight:normal;
+    display:inline;
+}
+
+table.linkcontainer-table, table.plugin-table{
+    width:100%;
+    margin-top:20px;
+    margin-bottom:20px;
+}
+
+table.linkcontainer-table tr, table.plugin-table tr{
+    padding:5px;
+}
+
+table.linkcontainer-table > tfoot, table.plugin-table > tfoot{
+    background-color:#ddd;   
+    border-top:1px solid black;
+}
+table.linkcontainer-table > thead, table.plugin-table > thead{
+    background-color:#ddd;  
+    border-bottom:1px solid black;
+}
+table.linkcontainer-table th, table.plugin-table th{
+    text-align: left;
+    padding:5px;
+}
+table.linkcontainer-table td, table.plugin-table td{
+    padding:5px;
+}
+
+/* new link container control */
+span.add_new_linkcontainer{
+    cursor:pointer;
+    font-weight:normal;
+}
+span.add_new_plugin{
+    /*cursor:pointer;*/
+    font-weight:normal;
+}
+
+
+div.spot{
+    display:inline-block;
+    width:25px;
+    height:25px;   
+    background-size: contain; 
+}
+
+/*
+May need to look at thios again if edit spots are changed
+*/
+div.editspot{
+    background-image: url(/static/images/icons/editsvg.png);
+    background-position-y: 4px;
+    background-size: contain;
+    width: 25px;
+    height: 25px;
+    display:inline-block;
+    /*float: right;*/
+}
+
+div.deletespot{
+    background-image: url(/static/images/icons/delete_24.png);
+    /*background-position-y: 4px;*/
+    background-size: contain;
+    width: 20px;
+    height: 20px;
+    display:inline-block;
+    /*float: right;*/
+}
+
+div.copyspot{
+    background-image: url(/static/images/icons/icon_duplicate_24_trans.png);
+    /*background-position-y: 4px;*/
+    background-size: contain;
+    width: 25px;
+    height: 25px;
+    display:inline-block;
+    cursor:pointer;
+    /*float: right;*/
+}
+
+div.creeptable-reset{
+    cursor:default;
+}
+div.resetspot{
+    background-image: url(/static/images/299645-200.png);
+}
+
+div.editspot:hover, div.resetspot:hover,div.deletespot:hover{
+    cursor:pointer;
+}
+
+/*
+Style the default 'Actions' column button bar
+These will be over-ridden by the code to display actual status
+This replaces the 'Action' single toggle column and the 'Reset' single action column
+*/
+td > div.actionbuttonwrapper > div.actionbutton{
+    display: inline-block;
+    width:24px;
+    height:24px;
+    margin-right:2px;
+}
+
+td > div.actionbuttonwrapper > div.actionbutton:hover{
+    cursor:pointer;
+}
+td > div.actionbuttonwrapper > div.actionbutton.actionbutton-add{
+    background-image: url(/static/images/icons/add_24.png);
+}
+td > div.actionbuttonwrapper > div.actionbutton.actionbutton-remove{
+    background-image: url(/static/images/icons/delete_24.png);
+}
+td > div.actionbuttonwrapper > div.actionbutton.actionbutton-play{
+    background-image: url(/static/images/icons/play_24.png);
+}
+
+td > div.actionbuttonwrapper > div.actionbutton.actionbutton-play.actionbutton-play-resume{
+    border: 1px solid green;    /* temporary. need overlay with tick or similar. */
+}
+
+td > div.actionbuttonwrapper > div.actionbutton.actionbutton-pause{
+    background-image: url(/static/images/icons/pause_24.png);
+}
+td > div.actionbuttonwrapper > div.actionbutton.actionbutton-reset{
+    background-image: url(/static/images/icons/reset_24.png);
+}
+/* end action button styling */
+
+
+div.overlay_content{
+    
+}
+div.overlay_content input{
+    width:200px;
+}
+
+.dialogForm{
+    /*border:1px solid red;*/
+}
+
+
+
+/* custom styling for JQ dialog forms etc */
+.dialogForm input[type=text]{
+    width:450px;
+    margin-bottom:10px;
+}
+.dialogForm select{
+    width:450px;
+    margin-top:10px
+}
+.dialogForm checkbox{
+    margin-bottom:10px
+}
+
+.dialog-checkbox-container{
+    width:450px;
+    display:inline-block;
+}
+
+input.pure-button{
+    width:auto;
+}
+
+#new-pagetype-errormessage{
+    color: red;
+}
