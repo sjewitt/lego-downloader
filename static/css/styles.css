@@ -13,9 +13,7 @@ input.btn{
     padding-top:10px;
     padding-bottom:10px;
 }
-.options{
-    /*width:160px;*/
-}
+
 .actions{
     width:110px;
 }
@@ -35,11 +33,6 @@ input.btn{
     height:150px;
 }    
 
-.table-container{
-/*    height:150px;
-    overflow:auto;
-    border:1px solid #999;*/
-}
 
 /* overrides */
 .pure-table{
