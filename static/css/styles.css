@@ -13,7 +13,9 @@ input.btn{
     padding-top:10px;
     padding-bottom:10px;
 }
-
+.options{
+    /*width:160px;*/
+}
 .actions{
     width:110px;
 }
@@ -37,6 +39,7 @@ input.btn{
 /* overrides */
 .pure-table{
     width:100%;
+
 }
 
 div#filters > select{
@@ -47,17 +50,6 @@ div#progressbar{
     display:none;
 }
 
-div#progressbar div#done{
-    background-color: #009933;
-    padding-top:2px;
-    padding-bottom:2px;
-    
-}
-div#progressbar div#notdone{
-    background-color: #b94a48;
-    padding-top:2px;
-    padding-bottom:2px;
-}
 
 h3#progresstitle{
     margin-top:0px;
@@ -77,14 +69,8 @@ ul.tasks > li:hover{
     list-style-type:disc;
 }
 
-ul.tasks > li{
-    /*padding-bottom: 20px;*/
-    
-}
-
 ul.tasks > li.primary-task{
     font-size:18pt;
-    
 }
 
 .highlight{
@@ -105,176 +91,8 @@ div.form > div.pure-g{
     background-color: #ddd;
 }
 
-#lang_radio {
-    float:left;
-}
-#lang_radio input {
-    margin-right:5px;
-}
-
-#allfacets > select{
-    /*margin-left:20px;*/
-    width:250px;
-}
-img#spinner{
-    
-}
-
-#allfacets{
-    display:none;
-}
-
-#nomatch_button{
-    font-size: initial;
-    font-weight: initial;
-    margin-left:7px;
-}
-#facet_mapper_ui{
-    visibility: hidden;
-}
-
-#unlockfacetstable{
-    width:100%;
-}
-
-#unlockfacetstable > thead > tr > td ,#unlockfacetstable > tfoot > tr > td{
-    font-weight:bold;
-    background-color:#999;
-    padding:5px;
-}
-
-#unlockfacetstable > tbody > tr{
-    border-top:1px solid #999;
-}
-
-#unlockfacetstable > tbody > tr > td{
-    padding:5px;
-}
-
-#unlockfacetstable > tbody > tr > td > input{
-    margin-right:5px;
-}
-ul.response-icons{
-    padding-left:0px;
-}
-ul.response-icons > li{
-    display:inline-block;
-    float:left;
-    border: 1px dashed black;
-    margin-right: 5px;
-}
-div.response-icon{
-    float:left;
-    display:inline-block;
-    width:85px;
-    height:85px;
-    background-image: url(/static/images/smileys.png);
-}
-
-div.response-icon-path{
-    float:left;
-    display:inline-block;
-    width:85px;
-    height:85px;
-    background-image: url(/static/images/path.png);
-    background-size:contain;
-}
-
-div.response-icon.response-yes{
-    
-    background-position-x: 710px;
-}
-div.response-icon.response-maybe{
-    background-position-x: 621px;
-    background-position-y: 85px;
-}
-div.response-icon.response-no{
-    background-position-x: 532px;
-}
-div.response-icon.response-path{
-    background-position-y: 85px;
-    background-position-x: -89px;
-}
-
-div.response-icon-sml{
-    float:right;
-    display:inline-block;
-    background-image: url(/static/images/smileys-sml.png);
-    width:23px;
-    height:21px;
-    margin-right:10px;
-    cursor:pointer;
-}
-
-div.response-icon-sml > img{
-width:100%
-}
-div.response-icon-sml.response-yes{
-    background-position-x: 178px;
-}
-div.response-icon-sml.response-maybe{
-    background-position-x: 156px;
-    background-position-y: 87px;
-}
-div.response-icon-sml.response-no{
-    background-position-x: 133px;
-}
-div.response-icon-sml.response-pathed{
-    background-position-y: 21px;
-    background-position-x: -22px;
-}
-
-div#currentdomain > span{
-    font-weight:bold;
-}
-
-div#domain-history > ul > li.header{
-    padding: 5px;
-
-}
-div#domain-history > ul > li.header > div{
-    display:inline-block;
-    float:right;
-}
-
-div#domain-history > ul > li.header span{
-    font-size: 14pt;
-    font-weight:bold;
-}
-div#domain-history > ul > li.header > div > span{
-    padding-right:63px;
-}
-
-div#domain-history > ul{
-    list-style-type: none;
-    padding-left:0px;
-    padding:5px;
-    border:1px solid #aaa;
-}
 
 
-
-div#domain-history > ul > li{
-    height:23px;
-}
-div#domain-history > ul > li.odd{
-    background-color:#eee;
-}
-div#domain-history > ul > li.even{
-    background-color:#f6f6f6;
-}
-
-div#domain-history > ul > li > a{
-    text-decoration: none;
-}
-div#domain-history > ul > li > a:hover{
-    text-decoration: underline;
-}
-
-/* Hide the markup for the diaogue */
-#domain-paths{
-	
-}
 #msgbox{
     margin:10px;
     padding:0px;
@@ -288,31 +106,8 @@ div#domain-history > ul > li > a:hover{
     top: 272px;
     left: 40px;
 }
-/* over-ride initial position for admin review page */
-div#msgbox.admintasks{
-    left: -4000px;
-}
 
-#msgbox-closer{
-    float: right;
-    border: 1px solid black;
-    width: 15px;
-    height: 15px;
-    text-align: center;
-}
 
-#msgbox-closer:hover{
-    cursor:pointer;
-}
-
-/*
-#msgbox > ul > li:first-of-type{
-    font-weight: bold;
-}*/
-
-/*#msg-content{
-    display:none;
-}*/
 
 .hidden{
     display:none;
@@ -322,38 +117,6 @@ div#msgbox.admintasks{
     font-weight: bold;
     padding-top:10px;
     padding-bottom:5px;
-    
-}
-
-/*
-height: 200px;
-    padding: 10px;
-    position: fixed;
-    z-index: 10;
-    background-color: aliceblue;
-    top: 248px;
-    left: 40px;
-*/
-
-/* Admin stuff */
-#msgbox-admin{
-    margin:10px;
-    padding:0px;
-    /*border:1px dashed grey;*/
-    width: 400px;
-    overflow:hidden;
-/*    height:0px;
-    position: absolute;
-    z-index: 10;*/
-    background-color: aliceblue;
-/*    top: 358px;
-    left: 40px;*/
-}
-
-
-#moredomains{
-    width: 100%;
-    height: 300px;
 }
 
 /* wrapper for loading indicators */
@@ -375,22 +138,7 @@ a.resetdomain > img{
 master table list 
 see https://datatables.net/forums/discussion/30530/set-fixed-column-width
 */
-#domains-admin{
-    table-layout: fixed;
-    word-wrap:break-word;
-}
 
-#domain-admin-filter input{
-    padding:5px;
-}
-#back-to-filter{
-    padding-bottom: 10px;
-    font-weight:bold;
-}
-
-/*#apply-filter{
-    color:#999;
-}*/
 
 /* Row highlighter */
 table#domains-admin > thead > tr, table#domains-admin > tfoot > tr{

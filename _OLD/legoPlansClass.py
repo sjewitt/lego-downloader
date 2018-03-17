@@ -1,5 +1,7 @@
 from urllib import request
-import json
+from pymongo import MongoClient
+import gridfs
+# import json
 # from mako.template import Template
 from mako.lookup import TemplateLookup
 lookup = TemplateLookup(directories=['templates'], output_encoding='utf-8', encoding_errors='replace')
@@ -18,7 +20,7 @@ class LegoPlans():
 
 
     def __init__(self):
-        print('bootstrapping...')
+        print('bootstrapping API...')
         self.loadplans()
     
     @cherrypy.expose
@@ -81,10 +83,36 @@ class LegoPlans():
             for plan in self.planData:
                 print(plan['SetNumber'])
                 if kwargs!= None and 'setnumber' in kwargs and kwargs['setnumber'] == plan['SetNumber']:
-                    print('fitering..')
+                    print('filtering..')
                     _out.append(plan)
                  
         return(_out)
+
+    
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    @cherrypy.tools.json_in()
+    def getstoredplan(self,**kwargs):
+        print('getting local stored data')
+        if kwargs!= None and 'getlocal' in kwargs:
+            _out = self.planData
+            LegoPlansDB = MongoClient().LegoPlans
+            _id = LegoPlansDB['fs.files'].find_one({'filename':'test.pdf'},{'_id':1})
+            fs = gridfs.GridFS(LegoPlansDB)
+            _file = fs.get(_id)
+            
+            '''
+            get GUID by filename:
+            '''
+            return(_file)
+        
+        else:
+            return('No file')
+    
+
+    
+    
+
 
     def stripThing(self,thing,thingToStrip):
         return(thing.replace(thingToStrip,''))

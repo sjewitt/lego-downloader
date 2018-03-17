@@ -3,7 +3,9 @@ var engine = {
 	plandata : null,
     
     init : function(){
-    	this.plansloaded();
+//    	this.plansloaded();
+    	//NOTE The plans are loaded into mongo as a separate process
+    	engine.getplandata({'setnumber':'showall'});
     },
     
     //check that the plans are loaded
@@ -58,15 +60,42 @@ var engine = {
             url : "/api/getplandata?setnumber=" + params.setnumber
         }).done(function(data){
         	engine.planData = data;
-        	var _out = "<table id='plans_listing'><thead><tr><th>Set number</th><th>Description</th><th>Notes</th></tr></thead>";
-        	_out += "<tfoot><th>Set number</th><th>Description</th><th>Notes</th></tfoot><tbody>";
+        	var _out = "<table id='plans_listing'><thead><tr><th>Set number</th><th>Description</th><th>Notes</th><th>Add to DB</th><th></th></tr></thead>";
+        	_out += "<tfoot><th>Set number</th><th>Description</th><th>Notes</th><th>Add to DB</th><th></th></tfoot><tbody>";
         	
             for(var a=0;a<engine.planData.length;a++){
-            	var _link = 'No longer listed at LEGO.com';
-            	if(engine.planData[a].Notes !== '{No longer listed at LEGO.com}'){
-            		_link = '<a href="' + engine.planData[a].URL + '" target="_blank">' + engine.planData[a].Description + '</a>';
+            	
+            	var _link = engine.planData[a].Description;
+//            	var _link = '<a href="' + engine.planData[a].URL + '" target="_blank">' + engine.planData[a].Description + '</a>';
+
+            	//detect the download status form the object. The downloaded flag will be checked a the python end.
+            	var _isFlaggedForDownload = engine.planData[a].download;
+            	var _isDownloaded = engine.planData[a].downloaded;
+            	
+            	var _downloadFlagIsChecked = '';
+            	if(_isFlaggedForDownload){
+            		_downloadFlagIsChecked = 'checked="checked"';
+            		console.log(engine.planData[a]);
             	}
-            	_out += '<tr><td>' + engine.planData[a].SetNumber+'</td><td>' + _link + '</td><td>' + engine.planData[a].Notes + '</td></tr>';
+            	if(_isDownloaded){
+            		_downloadFlagIsChecked = 'disabled="disabled"';
+            			console.log(engine.planData[a]);
+            	}
+            	
+            	var _isDownloadedMsg = '';
+            	if(_isDownloaded){
+            		_isDownloadedMsg = '[<a href="/api/getstoredplan?getlocal=' + engine.planData[a].key + '.pdf" target="_blank">open</a>]'; 
+            		_isDownloadedMsg += ' [<a href="/api/getstoredplan?action=download&getlocal=' + engine.planData[a].key + '.pdf">download</a>]'
+            	}
+            	
+            	_out += '<tr><td>' 
+            		+ engine.planData[a].SetNumber+'</td><td>' 
+            		+ _link + '</td><td>' 
+            		+ engine.planData[a].Notes 
+            		+ '</td><td class="download_checkbox"><input type="checkbox" value="' 
+            		+ engine.planData[a].key + '" ' + _downloadFlagIsChecked + '></td>'
+            		+ '<td>'+_isDownloadedMsg+'</td>'
+            		+ '</tr>';
             }
             _out += '</table>';
             $('#plans_list').html(_out);
@@ -74,11 +103,28 @@ var engine = {
             	  "pageLength": 50
             });
             
+            //see SO #30794672:
+            //$('td.download_checkbox > input').click(function(){
+            $('table').on('click','td.download_checkbox',function(){
+            	console.log('clicked');
+
+            	//send AJAX call to back end for this
+            	engine.setDownloadFlag($(this).find('input').attr('value'),$(this).find('input').is(':checked'));
+            });
+            
         }).fail(function(jqxhr, status, e){ 
             console.log("err"); 
         });
     },
     
+    setDownloadFlag : function(setnumber,flag){
+    	$.ajax({
+            type: "GET",
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            url : "/api/flagdownload?setnumber=" + setnumber + "&flag=" + flag    //flag is boolean - enable/disable the download
+        }).done(function(data){ });
+    },
     
     
     _getQSVal : function(url,param){
@@ -93,7 +139,6 @@ var engine = {
                     if(_out.indexOf('#') !== -1){
                         _out = _out.split(/#/)[0];
                     }
-//                    return(_bits[b].split(/=/)[1]);
                     return(_out);
                 }
             }
