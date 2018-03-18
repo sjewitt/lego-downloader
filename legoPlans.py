@@ -112,7 +112,6 @@ class LegoPlans():
             #TODO: Test for file already in the gridFS:
             _downloaded = False
             _downloadedCount = self.LegoPlansDB['fs.files'].find({'filename':kwargs['setnumber'] + '.pdf'}).count()
-            print(_downloadedCount)
             if _downloadedCount > 0:
                 _downloaded = True
                 _flag = False    #we don't need to download it again
@@ -128,22 +127,54 @@ class LegoPlans():
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def getplandata(self,**kwargs):
+        
+        '''
+        Also need to have option for flagged as download but not downloaded. This state will exist briefly while downloading, but before 
+        insertion into mongo. Also, will indicate if teh fetcher has failed.
+        '''
+        
         _out = list()
         self.planData = list(self.LegoPlansDB['DownloadQueue'].find({},{'_id':0}))
-        if kwargs!= None and 'setnumber' in kwargs and kwargs['setnumber'] == 'showall':
+        
+        if kwargs!= None and 'show' in kwargs and kwargs['show'] == 'all':
             _out = self.planData
             
-        #get filtered data:
+        #get specific plan data:
         elif kwargs!= None and 'setnumber' in kwargs:
             for plan in self.planData:
                 if kwargs['setnumber'] == plan['SetNumber']:
                     _out.append(plan)
                     
+        #get stored plan data:
+        elif kwargs!= None and 'show' in kwargs and kwargs['show'] == 'stored':
+            
+            for plan in self.planData:
+                if 'downloaded' in plan and plan['downloaded'] == True:
+                    _out.append(plan)
+                    
+        #get stored plan data:
+        elif kwargs!= None and 'show' in kwargs and kwargs['show'] == 'notstored':
+            
+            for plan in self.planData:
+                if ('downloaded' in plan and plan['downloaded'] == False) or not 'downloaded' in plan:
+                    _out.append(plan)
+                    
+                    
+        #get stored plan data:
+        elif kwargs!= None and 'show' in kwargs and kwargs['show'] == 'pending':
+#             print('pending')
+            for plan in self.planData:
+                if ('download' in plan and plan['download'] == True) and not plan['downloaded']:
+                    _out.append(plan)
+            
+            
+            
+            
+                    
         elif kwargs!= None and 'filter' in kwargs:
             for plan in self.planData:
                 if kwargs['filter'].lower() in plan['Notes'].lower() or kwargs['filter'].lower() in plan['Description'].lower():
                     _out.append(plan)
-            
         return(_out)
 
     @cherrypy.expose
