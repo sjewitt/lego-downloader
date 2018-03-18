@@ -161,9 +161,6 @@ table#domains-admin > tbody > tr.odd{
     text-decoration: underline;
 }
 
-/*
-Navbar stuff, concept taken from Tonto
-*/
 .divider{
     border-bottom:1px solid #777;
 }
@@ -556,3 +553,15 @@ input.pure-button{
 #new-pagetype-errormessage{
     color: red;
 }
+
+/* table.dataTable tbody tr */
+table.dataTable tbody tr.odd{
+	background-color:#ccc;
+}
+
+table.dataTable tbody tr.even{
+	background-color:#eee;
+}
+
+
+

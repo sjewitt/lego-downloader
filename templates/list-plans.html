@@ -22,12 +22,18 @@
             <div class="pure-g">
                 <div class="pure-u-2-3">
                     <h1>LEGO plans downloader</h1>
+                    <ul id="startlinks">
+                        <li id='plans_show_stored'><a href='#'>Stored</a></li> <!-- filter by downloaded=true  -->
+                        <li id='plans_show_not_stored'><a href='#'>Not stored</a></li><!-- exclude downloaded=true  -->
+                        <li id='plans_show_pending'><a href='#'>pending</a></li><!-- show pending  -->
+                        <li id='plans_show_all'><a href='#'>All</a></li><!-- show all  -->
+                    </ul>
                 </div>
             </div>
             
             <div class="pure-g">
                 <div class="pure-u-1" id="plans_list">
-     
+                    
                 </div>
             </div>
         </div>
