@@ -5,5 +5,10 @@ The UI allows browsing of all plans listed at https://brickset.com/exportscripts
 
 The UI also allows display and local download of the plans already stored in MongoDB.
 
+## Planned updates:
+ - Ability to add unlisted/self scanned plans
+ - Ability to update the notes/descriptions against each plan
+ - Ability to delete a previously downloadwed plan
+
 ## WTF did I do this?
 Because I wanted to digitize all the Lego plans I have (a lot...) and finding them on lego.com is a right pain in the bum...
