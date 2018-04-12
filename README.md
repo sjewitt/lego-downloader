@@ -19,7 +19,7 @@ The cached view of the 'Not stored' plans offers options for flagging of selecte
 
 *LEGO Plans downloader - Flag for download*
 
-The cached view of the 'Stored' plans offers options for downloading, opening or resetting (to re-download) the pland retrieved and  already stored in MongoDB. 
+The cached view of the 'Stored' plans offers options for downloading, opening or resetting (to re-download) the plans retrieved and  already stored in MongoDB. 
 
 ![See or download locally stored plans](https://github.com/sjewitt/lego-downloader/blob/master/static/lego-3.png)
 
