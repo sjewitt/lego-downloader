@@ -25,13 +25,13 @@ The cached view of the 'Stored' plans offers options for downloading, opening or
 
 *LEGO Plans downloader - Open or download locally stored plans*
 
-I didn't want to link directly to the plans on lego.com, again for HTTP traffic reduction purposes (and my broadband is pretty poor).
+I didn't want to link directly to the plans on lego.com for HTTP traffic reduction purposes (and my broadband is pretty poor).
 
 ## Planned updates:
  - Make it a bit prettier...
  - Ability to add unlisted/self scanned plans
  - Ability to update the notes/descriptions against each plan
- - Ability to delete a previously downloadwed plan
+ - Ability to delete a previously downloaded plan
 
 ## WTF did I do this?
 Because I wanted to digitize all the Lego plans I have (a lot...) and finding them on lego.com is a right pain in the bum...
