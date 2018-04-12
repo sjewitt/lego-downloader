@@ -7,7 +7,9 @@ The UI provides the option to build a local cache of all plan links listed at ht
 
 *LEGO Plans downloader - Start screen*
 
-The UI also allows browsing of this cached view. This is the 'List plans' link. The screen allows you to view plans already stored locally, cached plan links that are not stored locally, those you have flagged to download the PDF but have not yet completed, or all download links, regardless of PDF download status.
+The UI also allows browsing of this cached view. This is the 'List plans' link. 
+
+The following screen allows you to view plans already stored locally, cached plan links that are not stored locally, those you have flagged to download the PDF but have not yet completed, or all download links, regardless of PDF download status.
 
 ![List download links options](https://github.com/sjewitt/lego-downloader/blob/master/static/lego-2.png)
 
