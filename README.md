@@ -7,13 +7,15 @@ The UI provides the option to build a local cache of all plan links listed at ht
 
 *LEGO Plans downloader - Start screen*
 
-The UI also allows browsing of this cached view. This is the 'List plans' link. 
 
-The following screen allows you to view plans already stored locally, cached plan links that are not stored locally, those you have flagged to download the PDF but have not yet completed, or all download links, regardless of PDF download status.
+The UI also allows browsing of this cached view via the 'List plans' link. 
+
+The following screen allows you to list plans already stored locally, list plans not stored locally, those you have flagged to download the PDF but have not yet completed, or all download links, regardless of PDF download status.
 
 ![List download links options](https://github.com/sjewitt/lego-downloader/blob/master/static/lego-2.png)
 
 *LEGO Plans downloader - Plan link listing options*
+
 
 The cached view of the 'Not stored' plans offers options for flagging of selected plans for download. The flagged plans are downloaded and stored in MongoDB GridFS by the separate fetcher process (legoFileStore.py and fetch.sh).
 
@@ -21,11 +23,13 @@ The cached view of the 'Not stored' plans offers options for flagging of selecte
 
 *LEGO Plans downloader - Flag for download*
 
+
 The cached view of the 'Stored' plans offers options for downloading, opening or resetting (to re-download) the plans retrieved and  already stored in MongoDB. 
 
 ![See or download locally stored plans](https://github.com/sjewitt/lego-downloader/blob/master/static/lego-3.png)
 
 *LEGO Plans downloader - Open or download locally stored plans*
+
 
 I didn't want to link directly to the plans on lego.com for HTTP traffic reduction purposes (and my broadband is pretty poor).
 
