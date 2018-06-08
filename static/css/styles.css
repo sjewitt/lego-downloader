@@ -563,5 +563,15 @@ table.dataTable tbody tr.even{
 	background-color:#eee;
 }
 
+th{
+	text-align:left;
+}
 
+span.link{
+	color:blue;
+}
+span.link:hover{
+	text-decoration:underline;
+    cursor:pointer;
+}
 

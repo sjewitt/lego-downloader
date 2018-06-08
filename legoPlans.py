@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 import gridfs
 
+
 from urllib import request
 from mako.lookup import TemplateLookup
 lookup = TemplateLookup(directories=['templates'], output_encoding='utf-8', encoding_errors='replace')
@@ -47,12 +48,12 @@ class LegoPlans():
     #possily also issues as there are {} characters which may be causing parsing problems as well.
     '''
     Read the CSV at source URL, cache as dict/in MongoDB, return boolean loaded status
+    This refreshes the download queue from the source
     '''
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def loadplans(self):
-#         if self.planDataLoaded == False:
-#             self.LegoPlansDB['DownloadQueue'].drop()
+
         _out = request.urlopen(self._sourceUrl)
         _content = _out.read().decode()
         _reader = _content.split('\r\n')
@@ -68,14 +69,26 @@ class LegoPlans():
                     _headers[3]:_row[3].replace('"',''),   # Notes
                     _headers[4]:_row[4].replace('"',''),   # DateAdded
                     _headers[5]:_row[5].replace('"',''),   # DateRetrieved
-#                         'download':False,
-#                         'downloaded':False,
-                    'key':(_row[1].replace('"','').split('/')[-1]).split('.')[0]
+                    'key':(_row[1].replace('"','').split('/')[-1]).split('.')[0]  # filename minus extension
                 }
                 
                 self.planData.append(_rowData)
-#                     self.LegoPlansDB['DownloadQueue'].insert(_rowData)
-                self.LegoPlansDB['DownloadQueue'].update({'SetNumber':_row[0].replace('"',''),'URL':_row[1].replace('"','')},_rowData, upsert=True)
+
+                '''
+                Need to insert specific rows, otherwise I will replace all the downloaded flags...
+                '''
+                self.LegoPlansDB['DownloadQueue'].update({'SetNumber':_row[0].replace('"',''),'URL':_row[1].replace('"','')},
+                    {
+                        '$set':{
+                            'SetNumber':_row[0].replace('"',''),
+                            'URL':_row[1].replace('"',''),
+                            'Description':_row[2].replace('"',''),
+                            'Notes':_row[3].replace('"',''),
+                            'DateAdded':_row[4].replace('"',''),
+                            'DateRetrieved':_row[5].replace('"',''),     #From source
+                            'DateStoredLocally':'yyyy-mm-dd',            #TODO
+                    }}, 
+                    upsert=True)
             self.planDataLoaded = True  
         return(self.plansloaded())
     
@@ -130,7 +143,7 @@ class LegoPlans():
         
         '''
         Also need to have option for flagged as download but not downloaded. This state will exist briefly while downloading, but before 
-        insertion into mongo. Also, will indicate if teh fetcher has failed.
+        insertion into mongo. Also, will indicate if the fetcher has failed.
         '''
         
         _out = list()
@@ -208,7 +221,28 @@ class LegoPlans():
         else:
             return('No filename in parameter')
 
+    @cherrypy.expose
+    @cherrypy.tools.json_in()
+    def updateplan(self):
+        #see SO# 3743769
+        json_in = cherrypy.request.json
+        self.LegoPlansDB['DownloadQueue'].update({'key':json_in['key']},{'$set':{json_in['field']:json_in['val']}})
 
+    @cherrypy.expose
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
+    def resetdownload(self):
+        if hasattr(cherrypy.request, 'json'):
+            json_in = cherrypy.request.json
+            self.LegoPlansDB['DownloadQueue'].update({'key':json_in['key']},{'$set':{'download':True,'downloaded':False}})
+            return{'msg':'download status reset','status':'ok'}
+            
+            #update cached data for UI as well:
+            for plan in self.planData:
+                if plan['key'] == json_in['key']:
+                    plan['downloaded'] = False
+        else:
+            return({'msg':'Nothing to do...','status':'ok'})
 
     def stripThing(self,thing,thingToStrip):
         return(thing.replace(thingToStrip,''))

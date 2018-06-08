@@ -7,19 +7,19 @@ var engine = {
     	//NOTE The plans are loaded into mongo as a separate process
     	if($('#plans_list').length){
     		//bind handlers to links
-    		$('#plans_show_stored').click(function(){
+    		$('#plans_show_stored > a').click(function(){
     			engine.getplandata({'show':'stored'});
     			return false;
     		});
-    		$('#plans_show_not_stored').click(function(){
+    		$('#plans_show_not_stored > a').click(function(){
     			engine.getplandata({'show':'notstored'});
     			return false;
         	});
-    		$('#plans_show_pending').click(function(){
+    		$('#plans_show_pending > a').click(function(){
     			engine.getplandata({'show':'pending'});
     			return false;
         	});
-    		$('#plans_show_all').click(function(){
+    		$('#plans_show_all > a').click(function(){
     			engine.getplandata({'show':'all'});
     			return false;
 		    });
@@ -81,12 +81,21 @@ var engine = {
             url : "/api/getplandata?show=" + params.show
         }).done(function(data){
         	engine.planData = data;
-        	var _out = "<table id='plans_listing'><thead><tr><th>Set number</th><th>Description</th><th>Notes</th><th>Get</th><th></th></tr></thead>";
-        	_out += "<tfoot><th>Set number</th><th>Description</th><th>Notes</th><th>Get</th><th></th></tfoot><tbody>";
+        	var _out = "<table id='plans_listing'><thead><tr><th>Set number</th><th>Description</th><th>Notes</th><th>Actions</th><th></th></tr></thead>";
+        	_out += "<tfoot><th>Set number</th><th>Description</th><th>Notes</th><th>Actions</th><th></th></tfoot><tbody>";
+        	
+        	//TODO: Exclude items that are flagged as unavailable (i.e. we have alrady tried to get the plan, but we got a response othter than 200OK) 
         	
             for(var a=0;a<engine.planData.length;a++){
             	
-            	var _link = engine.planData[a].Description;
+            	var _desc = engine.planData[a].Description;
+            	var _notes = engine.planData[a].Notes;
+            	if(_desc.length === 0){
+            		_desc = "[No description]";
+            	}
+            	if(_notes.length === 0){
+            		_notes = "[No notes]";
+            	}
 
             	//detect the download status form the object. The downloaded flag will be checked a the python end.
             	var _isFlaggedForDownload = engine.planData[a].download;
@@ -104,13 +113,14 @@ var engine = {
             	if(_isDownloaded){
             		_isDownloadedMsg = '[<a href="/api/getstoredplan?getlocal=' + engine.planData[a].key + '.pdf" target="_blank">open</a>]'; 
             		_isDownloadedMsg += ' [<a href="/api/getstoredplan?action=download&getlocal=' + engine.planData[a].key + '.pdf">download</a>]'
+            		_isDownloadedMsg += ' [<span class="link" data-action="reset">Reset</span>]'  ///api/resetdownload
             	}
             	
-            	_out += '<tr><td>' 
-            		+ engine.planData[a].SetNumber+'</td><td>' 
-            		+ _link + '</td><td>' 
-            		+ engine.planData[a].Notes 
-            		+ '</td><td class="download_checkbox"><span class="plan_add"><input type="checkbox" value="' 
+            	_out += '<tr data-plan-item="' + engine.planData[a].key + '"><td>' 
+            		+ engine.planData[a].SetNumber+'</td><td class="plan-handler" data-plan-field="Description"><span>' 
+            		+ _desc + '</span></td><td class="plan-handler" data-plan-field="Notes"><span>' 
+            		+ _notes 
+            		+ '</span></td><td class="download_checkbox"><span class="plan_add"><input type="checkbox" value="' 
             		+ engine.planData[a].key + '" ' + _downloadFlagIsChecked + '></span></td>'
             		+ '<td>'+_isDownloadedMsg+'</td>'
             		+ '</tr>';
@@ -128,20 +138,108 @@ var engine = {
             	engine.setDownloadFlag($(this).find('input').attr('value'),$(this).find('input').is(':checked'));
             });
             
+            $('table').on('click','td.plan-handler > span',function(){
+            	//generate a form element, with a blur handler to reset it (removing the input, re-showing the text with update? TO CONFIRM)
+            	engine.getEditField($(this));
+            });
+            
+            $('table').on('click','span.link',function(){
+            	//generate a form element, with a blur handler to reset it (removing the input, re-showing the text with update? TO CONFIRM)
+            	console.log($(this).attr('data-action'));
+            	console.log($(this).parent().parent().attr('data-plan-item'));
+            	if($(this).attr('data-action') === "reset"){
+            		engine.resetDownload($(this).parent().parent().attr('data-plan-item'));
+            	}
+            	
+            	
+            	//need to remove  the parent tr as well
+            	console.log($(this).parent().parent().remove());
+            });
+
+            
         }).fail(function(jqxhr, status, e){ 
             console.log("err"); 
         });
     },
     
+    resetDownload : function(key){
+    	var _params = {'key':key};
+    	$.ajax({
+            type: "POST",  
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            data:JSON.stringify(_params),
+            url : "/api/resetdownload"
+        }).done(function(data){ });
+    	
+    	
+    },
+    
     setDownloadFlag : function(setnumber,flag){
     	$.ajax({
-            type: "GET",
+            type: "GET",  
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             url : "/api/flagdownload?setnumber=" + setnumber + "&flag=" + flag    //flag is boolean - enable/disable the download
         }).done(function(data){ });
     },
     
+    /*
+     * Construct an imput field with the current text:
+     * 
+     * params:
+     * elem: DOM element that was clicked (should be a td)
+     * 
+     */
+    getEditField : function(elem){
+    	var _out = document.createElement('input');
+        _out.setAttribute('type','text');
+        _out.setAttribute("value", $(elem).text());
+        $(_out).css({'width':'100%'});
+
+        $(_out).blur(function(){
+        	$(this).parent().find('span').css({'display':'inline'});
+        	//send update AJAX request:
+        	//key,identifier (class),value
+        	engine.updateEntry( 
+        			$(this).parent().parent().attr('data-plan-item'),
+        		    $(this).parent().attr('data-plan-field'),
+        		    $(this).val()
+        		);
+        	
+        	//update text:
+        	$(this).parent().find('span').text($(this).val());
+	        $(this).remove();
+        });
+
+        $(elem).parent().append(_out);
+        $(_out).focus();
+
+    	$(elem).parent().find('span').css({'display':'none'});
+    	return false;
+    },
+    
+    updateEntry : function(key,field,val){
+    	//sent AJAX request with:
+    	_update = {
+    		'key':key,
+    		'field':field,
+    		'val':val
+    	}
+    	
+    	$.ajax({
+            type: "POST",
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            data:JSON.stringify(_update),
+            url : "/api/updateplan",   //flag is boolean - enable/disable the download
+        }).done(function(){
+        	
+        	
+        });
+    	
+    	console.log(_update);
+    },
     
     _getQSVal : function(url,param){
         var _params = decodeURI(url).split('?');
