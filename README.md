@@ -1,4 +1,4 @@
-# LEGO Plans Downloader
+# LEGO Plans Downloader:
 Python web application for Lego plans downloading. Comprised of a user inteface running under cherrypy and a fetcher running from a looping shell file driving a command-line python script.
 
 The UI provides the option to build a local cache of all plan links listed at https://brickset.com/exportscripts/instructions. This is the 'Load plans from source' link.

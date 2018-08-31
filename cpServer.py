@@ -37,7 +37,7 @@ def start_server():
     cherrypy.engine.start()
     
     #API:
-    cherrypy.tree.mount(LegoPlans(), '/api',conf)
+    cherrypy.tree.mount(LegoPlans(), '/api/',conf)
     
     #UI:
     cherrypy.tree.mount(LegoPlansUI(), '/',conf)

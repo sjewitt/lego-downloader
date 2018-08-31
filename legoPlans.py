@@ -32,7 +32,7 @@ class LegoPlans():
     '''
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def default(self):
+    def index(self):
         return({
             'info':'Simple REST API for lego plans retrieval from https://brickset.com',
             'api':{
@@ -59,9 +59,14 @@ class LegoPlans():
         _reader = _content.split('\r\n')
         _headers = _reader[0].split(',')
         _reader.pop(0)
+        #debug
+#         _counter = 0
         for row in _reader:
             _row = row.split(',')
             if len(_row) >= 5:
+#                 _counter+=1
+#                 if _counter > 20:
+#                     break
                 _rowData = {
                     _headers[0]:_row[0].replace('"',''),   # SetNumber
                     _headers[1]:_row[1].replace('"',''),   # URL  
@@ -71,7 +76,7 @@ class LegoPlans():
                     _headers[5]:_row[5].replace('"',''),   # DateRetrieved
                     'key':(_row[1].replace('"','').split('/')[-1]).split('.')[0]  # filename minus extension
                 }
-                
+#                 print(_rowData)
                 self.planData.append(_rowData)
 
                 '''
@@ -87,6 +92,7 @@ class LegoPlans():
                             'DateAdded':_row[4].replace('"',''),
                             'DateRetrieved':_row[5].replace('"',''),     #From source
                             'DateStoredLocally':'yyyy-mm-dd',            #TODO
+                            'key':(_row[1].replace('"','').split('/')[-1]).split('.')[0]  # filename minus extension
                     }}, 
                     upsert=True)
             self.planDataLoaded = True  
@@ -243,6 +249,13 @@ class LegoPlans():
                     plan['downloaded'] = False
         else:
             return({'msg':'Nothing to do...','status':'ok'})
+    
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def default(self):
+        return({
+            'message':'endpoint not found'
+    })
 
     def stripThing(self,thing,thingToStrip):
         return(thing.replace(thingToStrip,''))

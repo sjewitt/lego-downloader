@@ -1,7 +1,6 @@
 var engine = {
     
 	plandata : null,
-    
     init : function(){
 
     	//NOTE The plans are loaded into mongo as a separate process
@@ -33,7 +32,6 @@ var engine = {
     
     //check that the plans are loaded
     plansloaded : function(){
-    	
     	$.ajax({
             type: "GET",
             contentType: 'application/json; charset=utf-8',
@@ -86,44 +84,51 @@ var engine = {
         	
         	//TODO: Exclude items that are flagged as unavailable (i.e. we have alrady tried to get the plan, but we got a response othter than 200OK) 
         	
+//        	console.log(engine.planData.length);
             for(var a=0;a<engine.planData.length;a++){
-            	
-            	var _desc = engine.planData[a].Description;
-            	var _notes = engine.planData[a].Notes;
-            	if(_desc.length === 0){
-            		_desc = "[No description]";
+//        	for(var a=0;a<10;a++){
+//        		console.log(engine.planData[a])
+            	if(engine.planData[a].SetNumber !== undefined){
+            		
+	            	var _desc = engine.planData[a].Description;
+	            	var _notes = engine.planData[a].Notes;
+	            	if(_desc.length === 0){
+	            		_desc = "[No description]";
+	            	}
+	            	if(_notes.length === 0){
+	            		_notes = "[No notes]";
+	            	}
+	
+	            	//detect the download status form the object. The downloaded flag will be checked at the python end.
+	            	var _isFlaggedForDownload = engine.planData[a].download;
+	            	var _isDownloaded = engine.planData[a].downloaded;
+	            	
+	            	var _downloadFlagIsChecked = '';
+	            	if(_isFlaggedForDownload){
+	            		_downloadFlagIsChecked = 'checked="checked"';
+	            	}
+	            	if(_isDownloaded){
+	            		_downloadFlagIsChecked = 'disabled="disabled"';
+	            	}
+	            	
+	            	/*Do as DOM elements - faster. Also - do some timing tests...*/
+	            	var _isDownloadedMsg = '';
+	            	if(_isDownloaded){
+	            		_isDownloadedMsg = '[<a href="/api/getstoredplan?getlocal=' + engine.planData[a].key + '.pdf" target="_blank">open</a>]'; 
+	            		_isDownloadedMsg += ' [<a href="/api/getstoredplan?action=download&getlocal=' + engine.planData[a].key + '.pdf">download</a>]'
+	            		_isDownloadedMsg += ' [<span class="link" data-action="reset">Reset</span>]'  ///api/resetdownload
+	            	}
+	            	
+	            	_out += '<tr data-plan-item="' + engine.planData[a].key + '"><td>' 
+	            		+ engine.planData[a].SetNumber+'</td><td class="plan-handler" data-plan-field="Description"><span>' 
+	            		+ _desc + '</span></td><td class="plan-handler" data-plan-field="Notes"><span>' 
+	            		+ _notes 
+	            		+ '</span></td><td class="download_checkbox"><span class="plan_add"><input type="checkbox" value="' 
+	            		+ engine.planData[a].key + '" ' + _downloadFlagIsChecked + '></span></td>'
+	            		+ '<td>'+_isDownloadedMsg+'</td>'
+	            		+ '</tr>';
+	            
             	}
-            	if(_notes.length === 0){
-            		_notes = "[No notes]";
-            	}
-
-            	//detect the download status form the object. The downloaded flag will be checked a the python end.
-            	var _isFlaggedForDownload = engine.planData[a].download;
-            	var _isDownloaded = engine.planData[a].downloaded;
-            	
-            	var _downloadFlagIsChecked = '';
-            	if(_isFlaggedForDownload){
-            		_downloadFlagIsChecked = 'checked="checked"';
-            	}
-            	if(_isDownloaded){
-            		_downloadFlagIsChecked = 'disabled="disabled"';
-            	}
-            	
-            	var _isDownloadedMsg = '';
-            	if(_isDownloaded){
-            		_isDownloadedMsg = '[<a href="/api/getstoredplan?getlocal=' + engine.planData[a].key + '.pdf" target="_blank">open</a>]'; 
-            		_isDownloadedMsg += ' [<a href="/api/getstoredplan?action=download&getlocal=' + engine.planData[a].key + '.pdf">download</a>]'
-            		_isDownloadedMsg += ' [<span class="link" data-action="reset">Reset</span>]'  ///api/resetdownload
-            	}
-            	
-            	_out += '<tr data-plan-item="' + engine.planData[a].key + '"><td>' 
-            		+ engine.planData[a].SetNumber+'</td><td class="plan-handler" data-plan-field="Description"><span>' 
-            		+ _desc + '</span></td><td class="plan-handler" data-plan-field="Notes"><span>' 
-            		+ _notes 
-            		+ '</span></td><td class="download_checkbox"><span class="plan_add"><input type="checkbox" value="' 
-            		+ engine.planData[a].key + '" ' + _downloadFlagIsChecked + '></span></td>'
-            		+ '<td>'+_isDownloadedMsg+'</td>'
-            		+ '</tr>';
             }
             _out += '</table>';
             $('#plans_list').html(_out);
@@ -145,18 +150,12 @@ var engine = {
             
             $('table').on('click','span.link',function(){
             	//generate a form element, with a blur handler to reset it (removing the input, re-showing the text with update? TO CONFIRM)
-            	console.log($(this).attr('data-action'));
-            	console.log($(this).parent().parent().attr('data-plan-item'));
             	if($(this).attr('data-action') === "reset"){
             		engine.resetDownload($(this).parent().parent().attr('data-plan-item'));
             	}
-            	
-            	
             	//need to remove  the parent tr as well
-            	console.log($(this).parent().parent().remove());
-            });
-
-            
+            	$(this).parent().parent().remove()
+            });            
         }).fail(function(jqxhr, status, e){ 
             console.log("err"); 
         });
@@ -176,6 +175,7 @@ var engine = {
     },
     
     setDownloadFlag : function(setnumber,flag){
+//    	console.log(setnumber);
     	$.ajax({
             type: "GET",  
             contentType: 'application/json; charset=utf-8',
@@ -238,7 +238,7 @@ var engine = {
         	
         });
     	
-    	console.log(_update);
+//    	console.log(_update);
     },
     
     _getQSVal : function(url,param){
