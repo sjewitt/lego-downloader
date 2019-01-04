@@ -1,5 +1,5 @@
 import requests
-from legoPlansClass import LegoPlans
+from legoPlans import LegoPlans
 
 plans = LegoPlans()
  
