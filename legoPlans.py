@@ -71,10 +71,10 @@ class LegoPlans():
                     _headers[0]:_row[0].replace('"',''),   # SetNumber
                     _headers[1]:_row[1].replace('"',''),   # URL  
                     _headers[2]:_row[2].replace('"',''),   # Description
-                    _headers[3]:_row[3].replace('"',''),   # Notes
-                    _headers[4]:_row[4].replace('"',''),   # DateAdded
-                    _headers[5]:_row[5].replace('"',''),   # DateRetrieved
-                    'key':(_row[1].replace('"','').split('/')[-1]).split('.')[0]  # filename minus extension
+                    # _headers[3]:_row[3].replace('"',''),   # Notes
+                    _headers[4]:_row[3].replace('"',''),   # DateAdded
+                    _headers[5]:_row[4].replace('"',''),   # DateRetrieved
+                    'key':_row[1].replace('"','').split('/')[-1]).split('.')[0]  # filename minus extension
                 }
 #                 print(_rowData)
                 self.planData.append(_rowData)
