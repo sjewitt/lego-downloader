@@ -16,6 +16,11 @@ class LegoPlansUI():
     def listplans(self):
         tmpl = lookup.get_template("list-plans.html")
         return tmpl.render()
+    
+    @cherrypy.expose
+    def listplans_paginated(self):
+        tmpl = lookup.get_template("list-plans-paginated.html")
+        return tmpl.render()
         
         
 
