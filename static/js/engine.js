@@ -276,10 +276,14 @@ var engine = {
 		let total_pages = Math.ceil(data.total / data.page_length);
 		
 		let _wrapper = document.createElement('ul');
-		let _back_one = document.createElement('li')
-		_back_one.appendChild(document.createTextNode('<'));
+		
 		let _back_many = document.createElement('li')
 		_back_many.appendChild(document.createTextNode('<<'));
+		let _back_one = document.createElement('li')
+		_back_one.appendChild(document.createTextNode('<'));
+		
+		let _pagination_info = document.createElement('li')
+		
 		let _fwd_one = document.createElement('li')
 		_fwd_one.appendChild(document.createTextNode('>'));
 		let _fwd_many = document.createElement('li')
@@ -292,16 +296,18 @@ var engine = {
 				page_length:this.getAttribute('data-page_length'),
 				total:this.getAttribute('data-total')
 			}
+			console.log(args)
 			engine.getplandata_paginated(args);
 		}
 		
-		let stats = document.getElementById('paginator_stats');
-		stats.innerHTML = 'page ' + data.curr_page + ' of ' + Math.ceil(data.total / data.page_length);
+//		let stats = document.getElementById('paginator_stats');
+		_pagination_info.innerHTML = 'page ' + data.curr_page + ' of ' + total_pages;
+		console.log(data.curr_page, total_pages)
 		
-		let prevpageone = data.curr_page > 0 ? data.curr_page : 0;
-		let prevpagemany = data.curr_page > data.curr_page * data.page_length ? data.curr_page : 0;
-		let nextpageone = data.curr_page < Math.ceil(data.total / data.page_length) ? data.curr_page + 1 :  math.ceil(data.total / data.page_length); 
-		let nextpagemany = data.curr_page < Math.ceil(data.total / data.page_length) ? data.curr_page + data.page_length :  math.ceil(data.total / data.page_length);
+		let prevpagemany = data.curr_page > 0 ? data.curr_page - 15 : 0;
+		let prevpageone = data.curr_page > 0 ? data.curr_page-1 : 0;
+		let nextpageone = data.curr_page <= total_pages ? data.curr_page+1 :  total_pages; 
+		let nextpagemany = data.curr_page <= total_pages ? data.curr_page + 15 :  total_pages;
 		
 		_back_one.setAttribute('data-targetpage',prevpageone);
 		_back_many.setAttribute('data-targetpage',prevpagemany);
@@ -318,6 +324,11 @@ var engine = {
 		_fwd_one.setAttribute('data-page_length',data.page_length);
 		_fwd_many.setAttribute('data-page_length',data.page_length);
 		
+		_back_one.setAttribute('class','paginator');
+		_back_many.setAttribute('class','paginator');
+		_fwd_one.setAttribute('class','paginator');
+		_fwd_many.setAttribute('class','paginator');
+		
 		_back_one.setAttribute('data-filter',data.filter_key);
 		_back_many.setAttribute('data-filter',data.filter_key);
 		_fwd_one.setAttribute('data-filter',data.filter_key);
@@ -328,19 +339,14 @@ var engine = {
 		_fwd_one.addEventListener('click',paginationHandler);
 		_fwd_many.addEventListener('click',paginationHandler);
 		
-		_wrapper.appendChild(_back_one)
-		_wrapper.appendChild(_back_many)
-		_wrapper.appendChild(_fwd_one)
-		_wrapper.appendChild(_fwd_many)
-		
-		return(_wrapper)
-		
+		_wrapper.appendChild(_back_many);
+		_wrapper.appendChild(_back_one);
+		_wrapper.appendChild(_pagination_info);
+		_wrapper.appendChild(_fwd_one);
+		_wrapper.appendChild(_fwd_many);
+		return(_wrapper);
 	},
-    
-    
-    
-    
-    
+
     resetDownload : function(key){
     	var _params = {'key':key};
     	$.ajax({
@@ -350,8 +356,6 @@ var engine = {
             data:JSON.stringify(_params),
             url : "/api/resetdownload"
         }).done(function(data){ });
-    	
-    	
     },
     
     setDownloadFlag : function(setnumber,flag){

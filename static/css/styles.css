@@ -50,6 +50,16 @@ div#progressbar{
     display:none;
 }
 
+#paginator > ul > li{
+	display: inline-block;
+	padding-left:5px;
+	padding-right: 5px;
+	
+}
+#paginator > ul > li.paginator:hover{
+	cursor: pointer;
+	text-decoration: underline;
+}
 
 h3#progresstitle{
     margin-top:0px;
