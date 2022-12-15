@@ -30,12 +30,13 @@ var engine = {
     		 
     		 /** paginated endpoints */
     		 $('#startlinks > li').each(function(){
-			console.log('appending handler to ', this)
+				console.log('appending handler to ', this)
 				$(this).on('click',function(){
 					console.log(this);
-					engine.getplandata_paginated({'page_length':25, 'filter': $(this).attr('data-action')});
+					engine.getplandata_paginated({'page_length':100, 'filter': $(this).attr('data-action')});
 				});
-			 })
+			 });
+			 $('#startlinks > li.active').click();
     	}
     },
     
@@ -74,7 +75,7 @@ var engine = {
             
         }).fail(function(jqxhr, status, e){ 
             console.log("err"); 
-        });
+        }).done(function(){});
     },
     
     /*
@@ -169,12 +170,10 @@ var engine = {
             console.log("err"); 
         });
     },
-    
-    
 
     getplandata_paginated : function(params){
-    	let page_length=25;
-    	let curr_page = 0;
+    	let page_length=100;
+    	let curr_page = 1;
     	let filter = 'all'
     	if(params['page_length']){
 			page_length = parseInt(params['page_length']);
@@ -195,7 +194,7 @@ var engine = {
 			console.log("/api/paginated_plandata?page_length=" + page_length + "&page_num=" + curr_page + "&filter=" + filter)
         	engine.planData = data;
         	// build as DOM properly
-        	var _out = "<table id='plans_listingxxx'><thead><tr><th>Set number</th><th>Description</th><th>Notes</th><th>Actions</th><th></th></tr></thead>";
+        	var _out = "<table><thead><tr><th>Set number</th><th>Description</th><th>Notes</th><th>Actions</th><th></th></tr></thead>";
         	_out += "<tfoot><th>Set number</th><th>Description</th><th>Notes</th><th>Actions</th><th></th></tfoot><tbody>";
         	
         	//TODO: Exclude items that are flagged as unavailable (i.e. we have alrady tried to get the plan, but we got a response othter than 200OK) 
@@ -272,72 +271,23 @@ var engine = {
     },
     
     getPaginationLinks : function(data){
-		console.log(data)
 		let total_pages = Math.ceil(data.total / data.page_length);
 		
 		let _wrapper = document.createElement('ul');
+		let _pagination_info = document.createElement('li');
+		_pagination_info.setAttribute('class','paginator_info');
+		_pagination_info.innerHTML = 'page ' + data.curr_page + ' of ' + total_pages + ' (of '+ data.total +' records)';
 		
-		let _back_many = document.createElement('li')
-		_back_many.appendChild(document.createTextNode('<<'));
-		let _back_one = document.createElement('li')
-		_back_one.appendChild(document.createTextNode('<'));
-		
-		let _pagination_info = document.createElement('li')
-		
-		let _fwd_one = document.createElement('li')
-		_fwd_one.appendChild(document.createTextNode('>'));
-		let _fwd_many = document.createElement('li')
-		_fwd_many.appendChild(document.createTextNode('>>'));
-		
-		let paginationHandler = function(){
-			let args = {
-				page_num:parseInt(this.getAttribute('data-targetpage')),
-				filter:this.getAttribute('data-filter'),
-				page_length:this.getAttribute('data-page_length'),
-				total:this.getAttribute('data-total')
-			}
-			console.log(args)
-			engine.getplandata_paginated(args);
-		}
-		
-//		let stats = document.getElementById('paginator_stats');
-		_pagination_info.innerHTML = 'page ' + data.curr_page + ' of ' + total_pages;
-		console.log(data.curr_page, total_pages)
-		
+		//get prev or next page numbers
 		let prevpagemany = data.curr_page > 0 ? data.curr_page - 15 : 0;
 		let prevpageone = data.curr_page > 0 ? data.curr_page-1 : 0;
 		let nextpageone = data.curr_page <= total_pages ? data.curr_page+1 :  total_pages; 
 		let nextpagemany = data.curr_page <= total_pages ? data.curr_page + 15 :  total_pages;
 		
-		_back_one.setAttribute('data-targetpage',prevpageone);
-		_back_many.setAttribute('data-targetpage',prevpagemany);
-		_fwd_one.setAttribute('data-targetpage',nextpageone);
-		_fwd_many.setAttribute('data-targetpage',nextpagemany);
-		
-		_back_one.setAttribute('data-total',data.total);
-		_back_many.setAttribute('data-total',data.total);
-		_fwd_one.setAttribute('data-total',data.total);
-		_fwd_many.setAttribute('data-total',data.total);
-		
-		_back_one.setAttribute('data-page_length',data.page_length);
-		_back_many.setAttribute('data-page_length',data.page_length);
-		_fwd_one.setAttribute('data-page_length',data.page_length);
-		_fwd_many.setAttribute('data-page_length',data.page_length);
-		
-		_back_one.setAttribute('class','paginator');
-		_back_many.setAttribute('class','paginator');
-		_fwd_one.setAttribute('class','paginator');
-		_fwd_many.setAttribute('class','paginator');
-		
-		_back_one.setAttribute('data-filter',data.filter_key);
-		_back_many.setAttribute('data-filter',data.filter_key);
-		_fwd_one.setAttribute('data-filter',data.filter_key);
-		_fwd_many.setAttribute('data-filter',data.filter_key);
-		
-		_back_one.addEventListener('click',paginationHandler);
-		_back_many.addEventListener('click',paginationHandler);
-		_fwd_one.addEventListener('click',paginationHandler);
-		_fwd_many.addEventListener('click',paginationHandler);
+		_back_one = this.getPaginationLink(data,prevpageone,'<',this.paginationHandler);
+		_back_many = this.getPaginationLink(data,prevpagemany,'<<',this.paginationHandler);
+		_fwd_one = this.getPaginationLink(data,nextpageone,'>',this.paginationHandler);
+		_fwd_many = this.getPaginationLink(data, nextpagemany, '>>', this.paginationHandler);
 		
 		_wrapper.appendChild(_back_many);
 		_wrapper.appendChild(_back_one);
@@ -346,7 +296,37 @@ var engine = {
 		_wrapper.appendChild(_fwd_many);
 		return(_wrapper);
 	},
+	
+	/** build link, or just display elem, from link data */
+	getPaginationLink : function(data, target_page,link_text,handler){
+		let total_pages = Math.ceil(data.total / data.page_length);
+		let _li = document.createElement('li');
+		_li.setAttribute('data-targetpage',target_page);
+		_li.setAttribute('data-total',data.total);
+		_li.setAttribute('data-page_length',100);	//TODO: Set this programmatically
+		_li.setAttribute('data-filter',data.filter_key);
+		_li.appendChild(document.createTextNode(link_text));
+		if(target_page > 0 && target_page < total_pages){
+			_li.setAttribute('class','paginator');
+			_li.addEventListener('click',handler);
+		}
 
+		console.log(_li)
+		return(_li);
+	},
+	
+	paginationHandler : function(){
+		console.log('in pagination handler...');
+		let args = {
+			page_num:parseInt(this.getAttribute('data-targetpage')),
+			filter:this.getAttribute('data-filter'),
+			page_length:this.getAttribute('data-page_length'),
+			total:this.getAttribute('data-total')
+		}
+		engine.getplandata_paginated(args);
+	},
+	
+	
     resetDownload : function(key){
     	var _params = {'key':key};
     	$.ajax({
@@ -359,7 +339,6 @@ var engine = {
     },
     
     setDownloadFlag : function(setnumber,flag){
-//    	console.log(setnumber);
     	$.ajax({
             type: "GET",  
             contentType: 'application/json; charset=utf-8',
@@ -404,7 +383,6 @@ var engine = {
     },
     
     updateEntry : function(key,field,val){
-    	//sent AJAX request with:
     	_update = {
     		'key':key,
     		'field':field,
@@ -417,12 +395,7 @@ var engine = {
             dataType: 'json',
             data:JSON.stringify(_update),
             url : "/api/updateplan",   //flag is boolean - enable/disable the download
-        }).done(function(){
-        	
-        	
-        });
-    	
-//    	console.log(_update);
+        }).done(function(){ });
     },
     
     _getQSVal : function(url,param){
@@ -448,9 +421,9 @@ var engine = {
 
 //ajax start/stop for progress icon
 $(document).bind('ajaxStart', function(){
-    $("#ajax-loading").dialog({
-        'modal':true
-    });
+//    $("#ajax-loading").dialog({
+//        'modal':true
+//    });
 }).bind('ajaxStop', function(){
-    $("#ajax-loading").dialog('close');
+//    $("#ajax-loading").dialog('close');
 });

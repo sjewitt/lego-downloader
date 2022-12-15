@@ -255,8 +255,8 @@ class LegoPlans():
     @cherrypy.tools.json_out()
     def paginated_plandata(self,**kwargs):
         
-        curr_page = int(kwargs.get('page_num',0))
-        page_length = int(kwargs.get('page_length',25))
+        curr_page = int(kwargs.get('page_num',1));
+        page_length = int(kwargs.get('page_length',100))
         filter_key = kwargs.get('filter','')
         filter_mapper = {
             'stored':{'downloaded':True},
@@ -266,7 +266,7 @@ class LegoPlans():
         total = self.filtered_count_plandata(filter_mapper.get(filter_key,{}))
         entries = list(self.LegoPlansDB['DownloadQueue']
                        .find(filter_mapper.get(filter_key,{}),{'_id':0})
-                       .skip(curr_page * page_length)
+                       .skip((curr_page-1) * page_length)
                        .limit(page_length).sort('key',1))
         paged_data = {
             'pagination_data':{

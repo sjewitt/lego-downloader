@@ -13,6 +13,11 @@ class LegoPlansUI():
         return tmpl.render()
     
     @cherrypy.expose
+    def manage(self):
+        tmpl = lookup.get_template("manage.html")
+        return tmpl.render()
+    
+    @cherrypy.expose
     def listplans(self):
         tmpl = lookup.get_template("list-plans.html")
         return tmpl.render()
