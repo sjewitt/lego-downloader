@@ -55,6 +55,9 @@ div#progressbar{
 	display: inline-block;
 	width: 19%;
 }
+#startlinks > li.active{
+	font-weight: bold;
+}
 #startlinks > li > a{
 	text-decoration: none;
 }

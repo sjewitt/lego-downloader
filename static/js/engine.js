@@ -30,15 +30,26 @@ var engine = {
     		 
     		 /** paginated endpoints */
     		 $('#startlinks > li').each(function(){
-				console.log('appending handler to ', this)
 				$(this).on('click',function(){
-					console.log(this);
 					engine.getplandata_paginated({'page_length':100, 'filter': $(this).attr('data-action')});
+					engine.toggleMenuHighlight(this);
 				});
 			 });
 			 $('#startlinks > li.active').click();
     	}
     },
+    
+    toggleMenuHighlight : function(elem){
+		console.log(elem);
+		for(item of elem.parentNode.children){
+			item.classList.remove('active');
+			if(item === elem){
+				item.classList.add('active')
+			}
+		}
+		//let elems = elem.parentNode.
+		//elem.classList.add('active');
+	},
     
     //check that the plans are loaded
     plansloaded : function(){
@@ -310,8 +321,6 @@ var engine = {
 			_li.setAttribute('class','paginator');
 			_li.addEventListener('click',handler);
 		}
-
-		console.log(_li)
 		return(_li);
 	},
 	
