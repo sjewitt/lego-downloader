@@ -33,11 +33,18 @@ input.btn{
     height:150px;
 }    
 
-
 /* overrides */
 .pure-table{
     width:100%;
+}
 
+#jump_to{
+	width: 52px;
+    margin-right: 5px;
+}
+
+#set_page_length{
+	width: 60px;
 }
 
 div#filters > select{

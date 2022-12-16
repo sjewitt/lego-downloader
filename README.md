@@ -38,6 +38,7 @@ I didn't want to link directly to the plans on lego.com for HTTP traffic reducti
  - Ability to add unlisted/self scanned plans
  - Ability to update the notes/descriptions against each plan
  - Ability to delete a previously downloaded plan
+ - add UI alert if mongo is unavailable!
 
 ## WTF did I do this?
 Because I wanted to digitize all the Lego plans I have (a lot...) and finding them on lego.com is a right pain in the bum...

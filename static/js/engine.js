@@ -1,5 +1,6 @@
 var engine = {
-    
+   
+//    page_length : 100,	//I shouldn't need to set this here - TODO'
 	plandata : null,
     init : function(){
 
@@ -31,7 +32,7 @@ var engine = {
     		 /** paginated endpoints */
     		 $('#startlinks > li').each(function(){
 				$(this).on('click',function(){
-					engine.getplandata_paginated({'page_length':100, 'filter': $(this).attr('data-action')});
+					engine.getplandata_paginated({'page_length':engine.page_length, 'filter': $(this).attr('data-action')});
 					engine.toggleMenuHighlight(this);
 				});
 			 });
@@ -183,7 +184,7 @@ var engine = {
     },
 
     getplandata_paginated : function(params){
-    	let page_length=100;
+    	//let page_length=100;
     	let curr_page = 1;
     	let filter = 'all'
     	if(params['page_length']){
@@ -200,9 +201,9 @@ var engine = {
             type: "GET",
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
-            url : "/api/paginated_plandata?page_length=" + page_length + "&page_num=" + curr_page + "&filter=" + filter
+            url : "/api/paginated_plandata?page_length=" + this.page_length + "&page_num=" + curr_page + "&filter=" + filter
         }).done(function(data){
-			console.log("/api/paginated_plandata?page_length=" + page_length + "&page_num=" + curr_page + "&filter=" + filter)
+			console.log("/api/paginated_plandata?page_length=" + this.page_length + "&page_num=" + curr_page + "&filter=" + filter)
         	engine.planData = data;
         	// build as DOM properly
         	var _out = "<table><thead><tr><th>Set number</th><th>Description</th><th>Notes</th><th>Actions</th><th></th></tr></thead>";
@@ -314,7 +315,7 @@ var engine = {
 		let _li = document.createElement('li');
 		_li.setAttribute('data-targetpage',target_page);
 		_li.setAttribute('data-total',data.total);
-		_li.setAttribute('data-page_length',100);	//TODO: Set this programmatically
+		_li.setAttribute('data-page_length',this.page_length);	//TODO: Set this programmatically
 		_li.setAttribute('data-filter',data.filter_key);
 		_li.appendChild(document.createTextNode(link_text));
 		if(target_page > 0 && target_page < total_pages){

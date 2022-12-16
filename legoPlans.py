@@ -21,6 +21,7 @@ class LegoPlans():
     planDataLoaded = False
     plansDB = None
     LegoPlansDB = None   
+    page_length = 50
 
 
     def __init__(self):
@@ -250,13 +251,24 @@ class LegoPlans():
         return(thing.replace(thingToStrip,''))
     
     # NEW MODEL, SERVER-SIDE PAGINATION
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def set_page_length(self, **kwargs):
+        self.page_length = int(kwargs.get('page_length',50))
+        return {'status':'ok', 'new_page_length': self.page_length}
+    
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def get_page_length(self):
+        return {'status':'ok', 'page_length': self.page_length}
     
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def paginated_plandata(self,**kwargs):
         
         curr_page = int(kwargs.get('page_num',1));
-        page_length = int(kwargs.get('page_length',100))
+        # page_length = int(kwargs.get('page_length',self.page_length))
+        page_length = self.page_length
         filter_key = kwargs.get('filter','')
         filter_mapper = {
             'stored':{'downloaded':True},
