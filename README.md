@@ -47,6 +47,7 @@ I didn't want to link directly to the plans on lego.com for HTTP traffic reducti
  - implement the page jump-to
  - implement a search on Notes and Description fields
  - indicate that these fields are in fact editable on hover
+ - add config option for mongo location, data source etc.
 
  
  
