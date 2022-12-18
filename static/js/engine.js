@@ -1,28 +1,32 @@
 var engine = {
    
-//    page_length : 100,	//I shouldn't need to set this here - TODO'
+//    page_length : 100,	//I shouldn't need to set this here'
 	plandata : null,
     init : function(){
-
+		/** we want to set the default, or currently selected, page length back to the dropdown as well as apply the click handler if we
+		want to reset it...*/
+		this.setCurrentPageLength();
+		this.setPageLengthButtonHandler();
+		this.setJumpToPageButtonHandler();
     	//NOTE The plans are loaded into mongo as a separate process
     	if($('#plans_list').length){
     		//bind handlers to links
-    		$('#plans_show_stored > a').click(function(){
-    			engine.getplandata({'show':'stored'});
-    			return false;
-    		});
-    		$('#plans_show_not_stored > a').click(function(){
-    			engine.getplandata({'show':'notstored'});
-    			return false;
-        	});
-    		$('#plans_show_pending > a').click(function(){
-    			engine.getplandata({'show':'pending'});
-    			return false;
-        	});
-    		$('#plans_show_all > a').click(function(){
-    			engine.getplandata({'show':'all'});
-    			return false;
-		    });
+//    		$('#plans_show_stored > a').click(function(){
+//    			engine.getplandata({'show':'stored'});
+//    			return false;
+//    		});
+//    		$('#plans_show_not_stored > a').click(function(){
+//    			engine.getplandata({'show':'notstored'});
+//    			return false;
+//        	});
+//    		$('#plans_show_pending > a').click(function(){
+//    			engine.getplandata({'show':'pending'});
+//    			return false;
+//        	});
+//    		$('#plans_show_all > a').click(function(){
+//    			engine.getplandata({'show':'all'});
+//    			return false;
+//		    });
     		/*
     		 * use 
     		 *     engine.getplandata({'show':nnnnnn});
@@ -40,16 +44,53 @@ var engine = {
     	}
     },
     
+    setPageLengthButtonHandler : function(){
+		let set_page_length = document.getElementById('set_page_length_btn');
+		set_page_length.addEventListener('click',function(evt){
+			let page_length_selector = document.getElementById('set_page_length');
+			fetch('/api/set_page_length?page_length=' + page_length_selector.value)
+				.then((response) => response.json())
+				.then(function(data){
+					/** find the highlighted menu, and click that */
+					document.querySelector('#startlinks > li.active').click();
+				});
+		});
+	},
+	
+	setJumpToPageButtonHandler : function(){
+		let jump_to_page = document.getElementById('jump_to_btn');
+		/** get the jump params from the paginator */
+		jump_to_page.addEventListener('click',function(){
+			
+		})
+	},
+    
+    setCurrentPageLength : function(){
+		
+		//use fetch API: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+		// see also https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions
+		fetch('/api/get_page_length')
+			.then(function(response){
+				return(response.json())
+			})
+			.then(function(data){
+				let page_length_selector = document.getElementById('set_page_length');
+				for (option of page_length_selector.children){
+					option.removeAttribute('selected');
+					if(option.value === data.page_length.toString()){
+						option.setAttribute('selected','selected');
+					}
+				}
+			})	
+	},
+    
     toggleMenuHighlight : function(elem){
-		console.log(elem);
 		for(item of elem.parentNode.children){
 			item.classList.remove('active');
 			if(item === elem){
 				item.classList.add('active')
 			}
 		}
-		//let elems = elem.parentNode.
-		//elem.classList.add('active');
 	},
     
     //check that the plans are loaded
@@ -90,98 +131,98 @@ var engine = {
         }).done(function(){});
     },
     
-    /*
-     * display the plans
-     */
-    getplandata : function(params){
-    	$.ajax({
-            type: "GET",
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            url : "/api/getplandata?show=" + params.show
-        }).done(function(data){
-        	engine.planData = data;
-        	var _out = "<table id='plans_listing'><thead><tr><th>Set number</th><th>Description</th><th>Notes</th><th>Actions</th><th></th></tr></thead>";
-        	_out += "<tfoot><th>Set number</th><th>Description</th><th>Notes</th><th>Actions</th><th></th></tfoot><tbody>";
-        	
-        	//TODO: Exclude items that are flagged as unavailable (i.e. we have alrady tried to get the plan, but we got a response othter than 200OK) 
-        	
-//        	console.log(engine.planData.length);
-            for(var a=0;a<engine.planData.length;a++){
-//        	for(var a=0;a<10;a++){
-//        		console.log(engine.planData[a])
-            	if(engine.planData[a].SetNumber !== undefined){
-            		
-	            	var _desc = engine.planData[a].Description;
-	            	//var _notes = engine.planData[a].Notes;
-	            	if(_desc.length === 0){
-	            		_desc = "[No description]";
-	            	}
-	            	/*if(_notes.length === 0){
-	            		_notes = "[No notes]";
-	            	}*/
-	
-	            	//detect the download status form the object. The downloaded flag will be checked at the python end.
-	            	var _isFlaggedForDownload = engine.planData[a].download;
-	            	var _isDownloaded = engine.planData[a].downloaded;
-	            	
-	            	var _downloadFlagIsChecked = '';
-	            	if(_isFlaggedForDownload){
-	            		_downloadFlagIsChecked = 'checked="checked"';
-	            	}
-	            	if(_isDownloaded){
-	            		_downloadFlagIsChecked = 'disabled="disabled"';
-	            	}
-	            	
-	            	/*Do as DOM elements - faster. Also - do some timing tests...*/
-	            	var _isDownloadedMsg = '';
-	            	if(_isDownloaded){
-	            		_isDownloadedMsg = '[<a href="/api/getstoredplan?getlocal=' + engine.planData[a].key + '.pdf" target="_blank">open</a>]'; 
-	            		_isDownloadedMsg += ' [<a href="/api/getstoredplan?action=download&getlocal=' + engine.planData[a].key + '.pdf">download</a>]'
-	            		_isDownloadedMsg += ' [<span class="link" data-action="reset">Reset</span>]'  ///api/resetdownload
-	            	}
-	            	
-	            	_out += '<tr data-plan-item="' + engine.planData[a].key + '"><td>' 
-	            		+ engine.planData[a].SetNumber+'</td><td class="plan-handler" data-plan-field="Description"><span>' 
-	            		+ _desc + '</span></td><td class="plan-handler" data-plan-field="Notes"><span>' 
-	            		//+ _notes 
-	            		+ '</span></td><td class="download_checkbox"><span class="plan_add"><input type="checkbox" value="' 
-	            		+ engine.planData[a].key + '" ' + _downloadFlagIsChecked + '></span></td>'
-	            		+ '<td>'+_isDownloadedMsg+'</td>'
-	            		+ '</tr>';
-	            
-            	}
-            }
-            _out += '</table>';
-            $('#plans_list').html(_out);
-            $('#plans_listing').dataTable({
-            	  "pageLength": 50
-            });
-            
-            //see SO #30794672 - defer binding so that hidden elements are also flagged:
-            $('table').on('click','td.download_checkbox',function(){
-
-            	//send AJAX call to back end for this
-            	engine.setDownloadFlag($(this).find('input').attr('value'),$(this).find('input').is(':checked'));
-            });
-            
-            $('table').on('click','td.plan-handler > span',function(){
-            	//generate a form element, with a blur handler to reset it (removing the input, re-showing the text with update? TO CONFIRM)
-            	engine.getEditField($(this));
-            });
-            
-            $('table').on('click','span.link',function(){
-            	//generate a form element, with a blur handler to reset it (removing the input, re-showing the text with update? TO CONFIRM)
-            	if($(this).attr('data-action') === "reset"){
-            		engine.resetDownload($(this).parent().parent().attr('data-plan-item'));
-            	}
-            	//need to remove  the parent tr as well
-            	$(this).parent().parent().remove()
-            });            
-        }).fail(function(jqxhr, status, e){ 
-            console.log("err"); 
-        });
-    },
+//    /*
+//     * display the plans
+//     */
+//    getplandata : function(params){
+//    	$.ajax({
+//            type: "GET",
+//            contentType: 'application/json; charset=utf-8',
+//            dataType: 'json',
+//            url : "/api/getplandata?show=" + params.show
+//        }).done(function(data){
+//        	engine.planData = data;
+//        	var _out = "<table id='plans_listing'><thead><tr><th>Set number</th><th>Description</th><th>Notes</th><th>Actions</th><th></th></tr></thead>";
+//        	_out += "<tfoot><th>Set number</th><th>Description</th><th>Notes</th><th>Actions</th><th></th></tfoot><tbody>";
+//        	
+//        	//TODO: Exclude items that are flagged as unavailable (i.e. we have alrady tried to get the plan, but we got a response othter than 200OK) 
+//        	
+////        	console.log(engine.planData.length);
+//            for(var a=0;a<engine.planData.length;a++){
+////        	for(var a=0;a<10;a++){
+////        		console.log(engine.planData[a])
+//            	if(engine.planData[a].SetNumber !== undefined){
+//            		
+//	            	var _desc = engine.planData[a].Description;
+//	            	//var _notes = engine.planData[a].Notes;
+//	            	if(_desc.length === 0){
+//	            		_desc = "[No description]";
+//	            	}
+//	            	/*if(_notes.length === 0){
+//	            		_notes = "[No notes]";
+//	            	}*/
+//	
+//	            	//detect the download status form the object. The downloaded flag will be checked at the python end.
+//	            	var _isFlaggedForDownload = engine.planData[a].download;
+//	            	var _isDownloaded = engine.planData[a].downloaded;
+//	            	
+//	            	var _downloadFlagIsChecked = '';
+//	            	if(_isFlaggedForDownload){
+//	            		_downloadFlagIsChecked = 'checked="checked"';
+//	            	}
+//	            	if(_isDownloaded){
+//	            		_downloadFlagIsChecked = 'disabled="disabled"';
+//	            	}
+//	            	
+//	            	/*Do as DOM elements - faster. Also - do some timing tests...*/
+//	            	var _isDownloadedMsg = '';
+//	            	if(_isDownloaded){
+//	            		_isDownloadedMsg = '[<a href="/api/getstoredplan?getlocal=' + engine.planData[a].key + '.pdf" target="_blank">open</a>]'; 
+//	            		_isDownloadedMsg += ' [<a href="/api/getstoredplan?action=download&getlocal=' + engine.planData[a].key + '.pdf">download</a>]'
+//	            		_isDownloadedMsg += ' [<span class="link" data-action="reset">Reset</span>]'  ///api/resetdownload
+//	            	}
+//	            	
+//	            	_out += '<tr data-plan-item="' + engine.planData[a].key + '"><td>' 
+//	            		+ engine.planData[a].SetNumber+'</td><td class="plan-handler" data-plan-field="Description"><span>' 
+//	            		+ _desc + '</span></td><td class="plan-handler" data-plan-field="Notes"><span>' 
+//	            		//+ _notes 
+//	            		+ '</span></td><td class="download_checkbox"><span class="plan_add"><input type="checkbox" value="' 
+//	            		+ engine.planData[a].key + '" ' + _downloadFlagIsChecked + '></span></td>'
+//	            		+ '<td>'+_isDownloadedMsg+'</td>'
+//	            		+ '</tr>';
+//	            
+//            	}
+//            }
+//            _out += '</table>';
+//            $('#plans_list').html(_out);
+//            $('#plans_listing').dataTable({
+//            	  "pageLength": 50
+//            });
+//            
+//            //see SO #30794672 - defer binding so that hidden elements are also flagged:
+//            $('table').on('click','td.download_checkbox',function(){
+//
+//            	//send AJAX call to back end for this
+//            	engine.setDownloadFlag($(this).find('input').attr('value'),$(this).find('input').is(':checked'));
+//            });
+//            
+//            $('table').on('click','td.plan-handler > span',function(){
+//            	//generate a form element, with a blur handler to reset it (removing the input, re-showing the text with update? TO CONFIRM)
+//            	engine.getEditField($(this));
+//            });
+//            
+//            $('table').on('click','span.link',function(){
+//            	//generate a form element, with a blur handler to reset it (removing the input, re-showing the text with update? TO CONFIRM)
+//            	if($(this).attr('data-action') === "reset"){
+//            		engine.resetDownload($(this).parent().parent().attr('data-plan-item'));
+//            	}
+//            	//need to remove  the parent tr as well
+//            	$(this).parent().parent().remove()
+//            });            
+//        }).fail(function(jqxhr, status, e){ 
+//            console.log("err"); 
+//        });
+//    },
 
     getplandata_paginated : function(params){
     	//let page_length=100;
@@ -201,9 +242,9 @@ var engine = {
             type: "GET",
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
-            url : "/api/paginated_plandata?page_length=" + this.page_length + "&page_num=" + curr_page + "&filter=" + filter
+            url : "/api/paginated_plandata?page_num=" + curr_page + "&filter=" + filter
         }).done(function(data){
-			console.log("/api/paginated_plandata?page_length=" + this.page_length + "&page_num=" + curr_page + "&filter=" + filter)
+			console.log("/api/paginated_plandata?page_num=" + curr_page + "&filter=" + filter)
         	engine.planData = data;
         	// build as DOM properly
         	var _out = "<table><thead><tr><th>Set number</th><th>Description</th><th>Notes</th><th>Actions</th><th></th></tr></thead>";
@@ -212,6 +253,7 @@ var engine = {
         	//TODO: Exclude items that are flagged as unavailable (i.e. we have alrady tried to get the plan, but we got a response othter than 200OK) 
             for(var a=0;a<engine.planData.entries.length;a++){
             	if(engine.planData.entries[a].SetNumber !== undefined){
+					console.log(engine.planData.entries[a]);
 	            	var _desc = engine.planData.entries[a].Description;
 	            	if(_desc.length === 0){
 	            		_desc = "[No description]";
@@ -220,6 +262,10 @@ var engine = {
 	            	//detect the download status form the object. The downloaded flag will be checked at the python end.
 	            	var _isFlaggedForDownload = engine.planData.entries[a].download;
 	            	var _isDownloaded = engine.planData.entries[a].downloaded;
+	            	let _notes = " - ";
+	            	if(engine.planData.entries[a].Notes){
+						_notes = engine.planData.entries[a].Notes;
+					}
 	            	
 	            	var _downloadFlagIsChecked = '';
 	            	if(_isFlaggedForDownload){
@@ -232,14 +278,14 @@ var engine = {
 	            	/*Do as DOM elements - faster. Also - do some timing tests...*/
 	            	var _isDownloadedMsg = '';
 	            	if(_isDownloaded){
-	            		_isDownloadedMsg = '[<a href="/api/getstoredplan?getlocal=' + engine.planData.entries[a].key + '.pdf" target="_blank">open</a>]'; 
-	            		_isDownloadedMsg += ' [<a href="/api/getstoredplan?action=download&getlocal=' + engine.planData.entries[a].key + '.pdf">download</a>]'
-	            		_isDownloadedMsg += ' [<span class="link" data-action="reset">Reset</span>]'  ///api/resetdownload
+	            		_isDownloadedMsg = '<a href="/api/getstoredplan?getlocal=' + engine.planData.entries[a].key + '.pdf" target="_blank"><img src="/static/images/open.png" title="Open plan in browser"></a>'; 
+	            		_isDownloadedMsg += ' <a href="/api/getstoredplan?action=download&getlocal=' + engine.planData.entries[a].key + '.pdf"><img src="/static/images/download.png" title="Save plan to file"></a>'
+	            		_isDownloadedMsg += ' <span class="link" data-action="reset"><img src="/static/images/reset.png" title="Remove downloaded file"></span>'  ///api/resetdownload
 	            	}
 	            	
 	            	_out += '<tr data-plan-item="' + engine.planData.entries[a].key + '"><td>' 
 	            		+ engine.planData.entries[a].SetNumber+'</td><td class="plan-handler" data-plan-field="Description"><span>' 
-	            		+ _desc + '</span></td><td class="plan-handler" data-plan-field="Notes"><span>' 
+	            		+ _desc + '</span></td><td class="plan-handler" data-plan-field="Notes"><span>' + _notes
 	            		+ '</span></td><td class="download_checkbox"><span class="plan_add"><input type="checkbox" value="' 
 	            		+ engine.planData.entries[a].key + '" ' + _downloadFlagIsChecked + '></span></td>'
 	            		+ '<td>'+_isDownloadedMsg+'</td>'

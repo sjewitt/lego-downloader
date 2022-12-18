@@ -39,6 +39,12 @@ I didn't want to link directly to the plans on lego.com for HTTP traffic reducti
  - Ability to update the notes/descriptions against each plan
  - Ability to delete a previously downloaded plan
  - add UI alert if mongo is unavailable!
-
+ - pass params/rewrite the URL to allow an f5 reload (otherwise it reverts to the default not storedf list)
+ - in-place field editor needs to compare existing with incoming for non-equality, only save and set edited=True if not matching
+ - dupe: 71286_X_K 2 - OK
+ - change words to icons on fetched display
+ - on re-fetch, indicate NEW entries, and maybe discontinued entries - I want to KEEP older entries...
+ 
+ 
 ## WTF did I do this?
 Because I wanted to digitize all the Lego plans I have (a lot...) and finding them on lego.com is a right pain in the bum...

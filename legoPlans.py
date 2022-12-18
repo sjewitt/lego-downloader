@@ -2,6 +2,7 @@ from pymongo import MongoClient
 import gridfs
 import csv
 from io import StringIO
+import uuid
 
 from urllib import request
 from mako.lookup import TemplateLookup
@@ -62,6 +63,8 @@ class LegoPlans():
             csv_reader = csv.reader(_f,delimiter=",")
             header_is_read = False
             # row_counter = 0
+            
+            _debug = {}
             for _row in csv_reader:
                 
                 if not header_is_read:
@@ -69,20 +72,27 @@ class LegoPlans():
                     header_is_read = True
                 else:  # first row is headers, used as field names
                     try:
-                        if len(_row) >= 5:
+                        if len(_row) >= 5 and _row[1]:
                             _rowData = {
                                 _headers[0]:_row[0],   # SetNumber
                                 _headers[1]:_row[1],   # URL  
                                 _headers[2]:_row[2],   # Description
                                 _headers[3]:_row[3],   # DateAdded
                                 _headers[4]:_row[4],   # DateModified
-                                'key':_row[1].split('/')[-1].split('.')[0]  # filename minus extension
+                                'key':_row[1].split('/')[-1].split('.pdf')[0]  # filename minus extension
                             }
+                            # debug
+                            if _row[1].split('/')[-1].split('.')[0] in _debug:
+                                _debug[_row[1].split('/')[-1].split('.')[0]] += 1
+                            else:
+                                _debug[_row[1].split('/')[-1].split('.')[0]] = 1
+                                
+                            if _row[2] == '71247_X_Enchanted Car':
+                                pass       #71247_X_Enchanted Car
+                            
                             self.planData.append(_rowData)  #this may not be needed if I properly paginate
                             
-                            '''
-                            Need to insert specific rows, otherwise I will replace all the downloaded flags...
-                            '''
+                            ''' Need to insert specific rows, otherwise I will replace all the downloaded flags... '''
                             self.LegoPlansDB['DownloadQueue'].update_one({'SetNumber':_rowData.get('SetNumber',None),'URL':_rowData.get('URL',None)},
                                 {
                                     '$set':{
@@ -95,11 +105,20 @@ class LegoPlans():
                                         'key':_rowData.get('key',None) # filename minus extension
                                 }}, 
                                 upsert=True)
-
+                        
+                        else:
+                            pass
+                        
                     except IndexError as err:
                         print(str(err))
 
             self.planDataLoaded = True  
+            
+            for thing in _debug:
+                if _debug[thing] > 1:
+                    print(thing, _debug[thing])
+                
+            
         return(self.plansloaded())
     
     '''
@@ -192,12 +211,9 @@ class LegoPlans():
         print('getting local stored data')
         if kwargs!= None and 'getlocal' in kwargs:
             
-            '''
-            get GUID by filename:
-            '''
+            ''' get GUID by filename: '''
 #             self.LegoPlansDB = MongoClient().LegoPlans
             _id = self.LegoPlansDB['fs.files'].find_one({'filename':kwargs['getlocal']},{'_id':1})
-            
             if _id is not None:
                 cherrypy.response.headers['Content-Type'] = 'application/pdf'
                 if 'action' in kwargs and kwargs['action'] == 'download':
@@ -207,22 +223,22 @@ class LegoPlans():
                 print(_id['_id'])
                 fs = gridfs.GridFS(self.LegoPlansDB)
                 _file = fs.get(_id['_id'])
-            
-            
-
                 return(_file)
             else:
                 return('No matching file')
-        
         else:
             return('No filename in parameter')
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
     def updateplan(self):
         #see SO# 3743769
         json_in = cherrypy.request.json
-        self.LegoPlansDB['DownloadQueue'].update({'key':json_in['key']},{'$set':{json_in['field']:json_in['val']}})
+        if self.LegoPlansDB['DownloadQueue'].count_documents({'key':json_in['key'], json_in['field']:json_in['val']}):
+            return {'status':'ok','message':'field value has not changed'}
+        result = self.LegoPlansDB['DownloadQueue'].update_one({'key':json_in['key']},{'$set':{json_in['field']:json_in['val'],'edited':True}})
+        return result.raw_result
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -243,9 +259,7 @@ class LegoPlans():
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def default(self):
-        return({
-            'message':'endpoint not found'
-    })
+        return({ 'message':'endpoint not found' })
 
     def stripThing(self,thing,thingToStrip):
         return(thing.replace(thingToStrip,''))
@@ -283,7 +297,7 @@ class LegoPlans():
         paged_data = {
             'pagination_data':{
                 'total':total,
-                'curr_page':curr_page,
+                'curr_page':curr_page,  
                 'page_length':page_length,
                 'filter_key':filter_key
                 },
