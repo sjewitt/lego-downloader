@@ -36,14 +36,18 @@ I didn't want to link directly to the plans on lego.com for HTTP traffic reducti
 ## Planned updates:
  - Make it a bit prettier...
  - Ability to add unlisted/self scanned plans
- - Ability to update the notes/descriptions against each plan
- - Ability to delete a previously downloaded plan
+ - Ability to update the notes/descriptions against each plan			DONE
+ - Ability to delete a previously downloaded plan						DONE (defacto - it's the reset button)
  - add UI alert if mongo is unavailable!
  - pass params/rewrite the URL to allow an f5 reload (otherwise it reverts to the default not storedf list)
- - in-place field editor needs to compare existing with incoming for non-equality, only save and set edited=True if not matching
- - dupe: 71286_X_K 2 - OK
- - change words to icons on fetched display
+ - in-place field editor needs to compare existing with incoming for non-equality, only save and set edited=True if not matching	DONE
+ - dupe: 71286_X_K 2 - OK			DONE - a bug, no URL against this record
+ - change words to icons on fetched display			DONE
  - on re-fetch, indicate NEW entries, and maybe discontinued entries - I want to KEEP older entries...
+ - implement the page jump-to
+ - implement a search on Notes and Description fields
+ - indicate that these fields are in fact editable on hover
+
  
  
 ## WTF did I do this?
