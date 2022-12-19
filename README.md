@@ -44,11 +44,12 @@ I didn't want to link directly to the plans on lego.com for HTTP traffic reducti
  - dupe: 71286_X_K 2 - OK			DONE - a bug, no URL against this record
  - change words to icons on fetched display			DONE
  - on re-fetch, indicate NEW entries, and maybe discontinued entries - I want to KEEP older entries...
- - implement the page jump-to
+ - implement the page jump-to	DONE
  - implement a search on Notes and Description fields
  - indicate that these fields are in fact editable on hover
  - add config option for mongo location, data source etc.
-
+ - need to also add a filter so I can find set numbers, so I can flag specific ones... 	DONE
+    -> db.getCollection("DownloadQueue").find({SetNumber:{$regex:/^1069/}}) 
  
  
 ## WTF did I do this?

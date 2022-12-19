@@ -23,6 +23,7 @@ class LegoPlans():
     plansDB = None
     LegoPlansDB = None   
     page_length = 50
+    set_filter = None
 
 
     def __init__(self):
@@ -246,7 +247,7 @@ class LegoPlans():
     def resetdownload(self):
         if hasattr(cherrypy.request, 'json'):
             json_in = cherrypy.request.json
-            self.LegoPlansDB['DownloadQueue'].update({'key':json_in['key']},{'$set':{'download':True,'downloaded':False}})
+            self.LegoPlansDB['DownloadQueue'].update_one({'key':json_in['key']},{'$set':{'download':True,'downloaded':False}})
             return{'msg':'download status reset','status':'ok'}
             
             #update cached data for UI as well:
@@ -273,8 +274,19 @@ class LegoPlans():
     
     @cherrypy.expose
     @cherrypy.tools.json_out()
+    def set_set_filter(self, **kwargs):
+        self.set_filter = kwargs.get('set_filter',None)
+        return {'status':'ok', 'new_set_filter': self.set_filter}
+    
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
     def get_page_length(self):
         return {'status':'ok', 'page_length': self.page_length}
+    
+    @cherrypy.expose
+    @cherrypy.tools.json_out()    
+    def get_set_filter(self):
+        return {'status':'ok', 'set_filter': self.set_filter}
     
     @cherrypy.expose
     @cherrypy.tools.json_out()
@@ -289,9 +301,18 @@ class LegoPlans():
             'notstored':{'downloaded':{'$in':[None,False]}},
             'pending':{'download':True,'downloaded':{'$in':[None,False]} }
         }
-        total = self.filtered_count_plandata(filter_mapper.get(filter_key,{}))
+        query = filter_mapper.get(filter_key,{})
+        # set_num = kwargs.get('set',None)
+        set_num = self.set_filter
+        if set_num:
+            set_regex = "".join(["^",set_num])
+            query['SetNumber'] = {'$regex' :set_regex}
+
+        # total = self.filtered_count_plandata(filter_mapper.get(filter_key,{}))
+        total = self.filtered_count_plandata(query)
         entries = list(self.LegoPlansDB['DownloadQueue']
-                       .find(filter_mapper.get(filter_key,{}),{'_id':0})
+                      # .find(filter_mapper.get(filter_key,{}),{'_id':0})
+                      .find(query,{'_id':0})
                        .skip((curr_page-1) * page_length)
                        .limit(page_length).sort('key',1))
         paged_data = {
@@ -299,7 +320,8 @@ class LegoPlans():
                 'total':total,
                 'curr_page':curr_page,  
                 'page_length':page_length,
-                'filter_key':filter_key
+                'filter_key':filter_key,
+                'set_filter' : self.get_set_filter()['set_filter']
                 },
             'entries':entries}
         return paged_data

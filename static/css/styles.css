@@ -71,6 +71,9 @@ div#progressbar{
 #startlinks > li > a:hover{
 	text-decoration: underline;
 }
+#set_num_filter{
+	width: 70px;
+}
 
 #paginator > ul > li{
 	display: inline-block;
