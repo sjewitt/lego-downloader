@@ -5,9 +5,11 @@ input.btn{
     width:110px;
     margin-left:5px;
 }
-
+body{
+	min-width: 768px;
+}
 .body{
-    padding:20px;
+    padding: 20px;
 }
 .row{
     padding-top:10px;
@@ -37,6 +39,14 @@ input.btn{
 .pure-table{
     width:100%;
 }
+div.controlbar{
+	background-color: #eeeefa;
+	position: sticky;
+    top: 200px;
+}
+div.centred{
+    text-align: center;
+}
 
 #jump_to{
 	width: 52px;
@@ -60,19 +70,31 @@ div#progressbar{
 }
 #startlinks > li{
 	display: inline-block;
-	width: 19%;
+	width: 17%;
+	text-align: center;
+	text-transform: uppercase;
+	border-left: 3px solid white;
+	border-right: 3px solid white;
 }
 #startlinks > li.active{
 	font-weight: bold;
+	border-left: 3px solid black;
+	border-right: 3px solid black;
 }
 #startlinks > li > a{
 	text-decoration: none;
+	color: black;
 }
 #startlinks > li > a:hover{
 	text-decoration: underline;
 }
 #set_num_filter{
-	width: 70px;
+	width: 50px;
+}
+
+#paginator > ul{
+ 	padding: 0px;
+    margin: 0px;
 }
 
 #paginator > ul > li{
@@ -88,7 +110,6 @@ div#progressbar{
 	font-size: 12pt;
 }
 #paginator > ul > li.paginator{
-/* 	font-size: 14pt; */
 	font-weight: bold;
 	color: black;
 }
@@ -101,8 +122,28 @@ div#progressbar{
 	width: 100%;
 }
 
-#plans_list > table tr > td > a > img, #plans_list > table tr > td > span > img{
+#plans_list th.actions_col{
+	width: 110px;
+}
+
+#plans_list > table tr > td a > img, #plans_list > table tr > td span > img{
 	width: 20px;
+}
+
+#plans_list td{
+	border: 1px solid transparent;
+} 
+
+#plans_list td.plan-handler:hover{
+	border: 1px dashed grey;
+	background-color:lightgrey;
+	/* custom edit icon */
+/* 	cursor: url('/static/images/edit.png')  10 8, auto; */
+}
+
+#plans_list td.plan-handler > span:hover{
+	/* custom edit icon */
+	cursor: url('/static/images/edit.png')  10 8, auto;
 }
 
 
@@ -132,9 +173,21 @@ ul.tasks > li.primary-task{
     font-weight:bold;
 }
 
+div.header{
+    background-image: url(/static/images/legoplans.jpg);
+    background-size: cover;
+    height: 200px;
+    position: sticky;
+    top: 0px;
+}
+div.header h1{
+	padding-left: 20px;
+    color: bisque;
+    font-size: 2.6em;
+}
 .wrapper{
     padding: 50px;
-    padding-top:0px;
+    padding-top: 0px
 }
 
 div.form > div.pure-g{
@@ -145,8 +198,6 @@ div.form > div.pure-g{
     padding:10px;
     background-color: #ddd;
 }
-
-
 
 #msgbox{
     margin:10px;

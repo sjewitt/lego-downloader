@@ -170,8 +170,8 @@ var engine = {
 			}
         	engine.planData = data;
         	// build as DOM properly
-        	var _out = "<table><thead><tr><th>Set number</th><th>Description</th><th>Notes</th><th>Actions</th><th></th></tr></thead>";
-        	_out += "<tfoot><th>Set number</th><th>Description</th><th>Notes</th><th>Actions</th><th></th></tfoot><tbody>";
+        	var _out = "<table><thead><tr><th>Set number</th><th>Description</th><th>Notes</th><th class='actions_col' colspan='2'>Actions</th></tr></thead>";
+        	_out += "<tfoot><th>Set number</th><th>Description</th><th>Notes</th><th class='actions_col' colspan='2'>Actions</th></tfoot><tbody>";
         	
         	//TODO: Exclude items that are flagged as unavailable (i.e. we have alrady tried to get the plan, but we got a response othter than 200OK) 
             for(var a=0;a<engine.planData.entries.length;a++){
@@ -198,21 +198,45 @@ var engine = {
 	            		_downloadFlagIsChecked = 'disabled="disabled"';
 	            	}
 	            	
-	            	/*Do as DOM elements - faster. Also - do some timing tests...*/
-	            	var _isDownloadedMsg = '';
+	            	let _isDownloadedMsg = '';
 	            	if(_isDownloaded){
 	            		_isDownloadedMsg = '<a href="/api/getstoredplan?getlocal=' + engine.planData.entries[a].key + '.pdf" target="_blank"><img src="/static/images/open.png" title="Open plan in browser"></a>'; 
 	            		_isDownloadedMsg += ' <a href="/api/getstoredplan?action=download&getlocal=' + engine.planData.entries[a].key + '.pdf"><img src="/static/images/download.png" title="Save plan to file"></a>'
 	            		_isDownloadedMsg += ' <span class="link" data-action="reset"><img src="/static/images/reset.png" title="Remove downloaded file"></span>'  ///api/resetdownload
 	            	}
+	            	/* Do as DOM elements - faster. Also - do some timing tests... */
+	            	let isDownloadedMsg = engine.getDOMElement('span',[]);
+	            	if(_isDownloaded){
+						let a1 = engine.getDOMElement('a',[{'attr':'href', 'val' : '/api/getstoredplan?getlocal=' + engine.planData.entries[a].key + '.pdf'},{'attr':'target','val':'_blank'}]);
+						let img1 = engine.getDOMElement('img',[{'attr':'src','val':'/static/images/open.png'}, {'attr':'title','val':'Open plan in browser'}]);
+						a1.appendChild(img1);
+						let a2 = engine.getDOMElement('a',[{'attr':'href', 'val' : '/api/getstoredplan?action=download&getlocal=' + engine.planData.entries[a].key + '.pdf'},{'attr':'target','val':'_blank'}]);
+						let img2 = engine.getDOMElement('img',[{'attr':'src','val':'/static/images/download.png'}, {'attr':'title','val':'Save plan to file'}]);
+						let s3 = engine.getDOMElement('span',[{'attr':'class', 'val' : 'link'},{'attr':'data-action','val':'reset'}]);
+						let img3 = engine.getDOMElement('img',[{'attr':'src','val':'/static/images/reset.png'}, {'attr':'title','val':'Remove downloaded file'}]);
+						a1.appendChild(img1);
+						a2.appendChild(img2);
+						s3.appendChild(img3);
+						isDownloadedMsg.appendChild(a1);
+						isDownloadedMsg.appendChild(a2);
+						isDownloadedMsg.appendChild(s3);
+					}
 	            	
 	            	_out += '<tr data-plan-item="' + engine.planData.entries[a].key + '"><td>' 
 	            		+ engine.planData.entries[a].SetNumber+'</td><td class="plan-handler" data-plan-field="Description"><span>' 
 	            		+ _desc + '</span></td><td class="plan-handler" data-plan-field="Notes"><span>' + _notes
 	            		+ '</span></td><td class="download_checkbox"><span class="plan_add"><input type="checkbox" value="' 
 	            		+ engine.planData.entries[a].key + '" ' + _downloadFlagIsChecked + '></span></td>'
-	            		+ '<td>'+_isDownloadedMsg+'</td>'
+	            		+ '<td>'+_isDownloadedMsg +'</td>'
+	            		//+ '<td>' + isDownloadedMsg.innerHTML +'</td>'	//NOT outerHTML - because I don't want the wrapper...
 	            		+ '</tr>';
+	            	//or...
+	            	let output_row = engine.getDOMElement('tr',[{'attr':'data-plan-item','val':'engine.planData.entries[a].key'}]);
+	            	let td_setnum = engine.getDOMElement('td',[]);
+	            	td_setnum.appendChild(document.createTextNode(engine.planData.entries[a].SetNumber));
+	            	span_desc = engine.getDOMElement('span',[]);
+	            	span_desc.appendChild(document.createTextNode(_desc));
+	            	
             	}
             }
             _out += '</table>';
@@ -236,6 +260,7 @@ var engine = {
             $('table').on('click','span.link',function(){
             	//generate a form element, with a blur handler to reset it (removing the input, re-showing the text with update? TO CONFIRM)
             	if($(this).attr('data-action') === "reset"){
+            		//engine.resetDownload($(this).parent().parent().attr('data-plan-item'));
             		engine.resetDownload($(this).parent().parent().attr('data-plan-item'));
             	}
             	//need to remove  the parent tr as well
@@ -253,11 +278,8 @@ var engine = {
     
     getPaginationLinks : function(data){
 		let total_pages = Math.ceil(data.total / data.page_length);
-		
-		let _wrapper = document.createElement('ul');
-		let _pagination_info = document.createElement('li');
-		_pagination_info.setAttribute('class','paginator_info');
-		_pagination_info.innerHTML = 'page ' + data.curr_page + ' of ' + total_pages + ' (of '+ data.total +' records)';
+		let _wrapper = this.getDOMElement('ul',[]);
+		let _pagination_info = this.getDOMElement('li',[{'attr':'class','val':'paginator_info'}]).appendChild(document.createTextNode('pg ' + data.curr_page + ' of ' + total_pages + ' (of '+ data.total +' records)'));
 		
 		//get prev or next page numbers
 		let prevpagemany = data.curr_page > 0 ? data.curr_page - 15 : 0;
@@ -265,10 +287,10 @@ var engine = {
 		let nextpageone = data.curr_page <= total_pages ? data.curr_page+1 :  total_pages; 
 		let nextpagemany = data.curr_page <= total_pages ? data.curr_page + 15 :  total_pages;
 		
-		_back_one = this.getPaginationLink(data,prevpageone,'<',this.paginationHandler);
-		_back_many = this.getPaginationLink(data,prevpagemany,'<<',this.paginationHandler);
-		_fwd_one = this.getPaginationLink(data,nextpageone,'>',this.paginationHandler);
-		_fwd_many = this.getPaginationLink(data, nextpagemany, '>>', this.paginationHandler);
+		let _back_one = this.getPaginationLink(data,prevpageone,'<',this.paginationHandler);
+		let _back_many = this.getPaginationLink(data,prevpagemany,'<<',this.paginationHandler);
+		let _fwd_one = this.getPaginationLink(data,nextpageone,'>',this.paginationHandler);
+		let _fwd_many = this.getPaginationLink(data, nextpagemany, '>>', this.paginationHandler);
 		
 		_wrapper.appendChild(_back_many);
 		_wrapper.appendChild(_back_one);
@@ -394,7 +416,18 @@ var engine = {
             }
         }
         return(null);
-    }
+    },
+    
+    /** function to generate DOM elements */
+    getDOMElement :function(elemTypeString,attrsArray){
+		console.log('creating ',elemTypeString, ' elem');
+		let elem = document.createElement(elemTypeString);
+		for(let a=0;a<attrsArray.length;a++){
+			console.log(attrsArray[a])
+			elem.setAttribute(attrsArray[a].attr,attrsArray[a].val);
+		}
+		return(elem);
+	}
 
 };
 
