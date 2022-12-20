@@ -1,14 +1,10 @@
-'''
-Created on 16 Mar 2018
-
-@author: silas
-'''
 from pymongo import MongoClient
 import gridfs
 import requests
+import argparse
 
-def start_fetcher():
-    LegoPlansDB = MongoClient().LegoPlans
+def start_fetcher(db_server, db_port, collection):
+    LegoPlansDB = MongoClient(db_server, db_port)[collection]
     
     queue = LegoPlansDB['DownloadQueue'].find_one({'downloaded': {'$in' : [None,False]},'download':True})
     
@@ -27,9 +23,7 @@ def start_fetcher():
             fs = gridfs.GridFS(LegoPlansDB)
             key = fs.put(_file.content,filename=_name)
             print(key)
-            '''
-            and flag as downloaded
-            '''
+            ''' and flag as downloaded '''
             LegoPlansDB['DownloadQueue'].update_one({'key':queue['key']},{'$set':{'downloaded':True}})
         else:
             print('Flag as unavailable')
@@ -39,4 +33,10 @@ def start_fetcher():
         print('Nothing to do...')
     
 if __name__ == '__main__':
-    start_fetcher()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-d','--db_server',default='localhost')
+    parser.add_argument('-p','--db_port',default=27017, type=int)
+    parser.add_argument('-c','--db_collection',default='LegoPlans')
+    args = parser.parse_args()
+    
+    start_fetcher(args.db_server, args.db_port, args.db_collection)

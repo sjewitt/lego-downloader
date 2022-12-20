@@ -279,7 +279,7 @@ var engine = {
     getPaginationLinks : function(data){
 		let total_pages = Math.ceil(data.total / data.page_length);
 		let _wrapper = this.getDOMElement('ul',[]);
-		let _pagination_info = this.getDOMElement('li',[{'attr':'class','val':'paginator_info'}]).appendChild(document.createTextNode('pg ' + data.curr_page + ' of ' + total_pages + ' (of '+ data.total +' records)'));
+		let _pagination_info = this.getDOMElement('li',[{'attr':'class','val':'paginator_info'}]).appendChild(document.createTextNode('p ' + data.curr_page + ' of ' + total_pages + ' (of '+ data.total +' records)'));
 		
 		//get prev or next page numbers
 		let prevpagemany = data.curr_page > 0 ? data.curr_page - 15 : 0;

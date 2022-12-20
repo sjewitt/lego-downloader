@@ -43,6 +43,7 @@ div.controlbar{
 	background-color: #eeeefa;
 	position: sticky;
     top: 200px;
+    padding: 5px;
 }
 div.centred{
     text-align: center;

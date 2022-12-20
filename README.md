@@ -50,6 +50,8 @@ I didn't want to link directly to the plans on lego.com for HTTP traffic reducti
  - add config option for mongo location, data source etc.
  - need to also add a filter so I can find set numbers, so I can flag specific ones... 	DONE
     -> db.getCollection("DownloadQueue").find({SetNumber:{$regex:/^1069/}}) 
+ - Add CLI args for database etc.
+     -> ALSO add CLI args to fetcher!!
  
  
 ## WTF did I do this?
