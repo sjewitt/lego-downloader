@@ -52,6 +52,7 @@ I didn't want to link directly to the plans on lego.com for HTTP traffic reducti
     -> db.getCollection("DownloadQueue").find({SetNumber:{$regex:/^1069/}}) 
  - Add CLI args for database etc.
      -> ALSO add CLI args to fetcher!!
+ - 
  
  
 ## WTF did I do this?

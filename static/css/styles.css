@@ -1,12 +1,22 @@
-/* 
-Styles for Fetch Service monitoring UI 
-*/
+/* Styles for Fetch Service monitoring UI */
 input.btn{
     width:110px;
     margin-left:5px;
 }
 body{
 	min-width: 768px;
+}
+th,td{
+	text-align:left;
+	border: 1px solid #eeeefa;
+	padding: 2px;
+}
+th{
+	padding-top: 5px;
+	padding-bottom: 5px;
+	text-align: center;
+	color: #eee;
+	background-color: #555;
 }
 .body{
     padding: 20px;
@@ -65,28 +75,34 @@ div#filters > select{
 div#progressbar{
     display:none;
 }
-#startlinks{
+#startlinks,#managelinks{
 	width: 100%;
     padding-inline-start: 0px;
 }
-#startlinks > li{
+#startlinks > li,#managelinks > li{
 	display: inline-block;
-	width: 17%;
 	text-align: center;
 	text-transform: uppercase;
 	border-left: 3px solid white;
 	border-right: 3px solid white;
 }
-#startlinks > li.active{
+#startlinks > li{
+	width: 17%;
+}
+#managelinks > li{
+	width: 48%;
+}
+
+#startlinks > li.active,#managelinks > li.active{
 	font-weight: bold;
 	border-left: 3px solid black;
 	border-right: 3px solid black;
 }
-#startlinks > li > a{
+#startlinks > li > a,#managelinks > li > a{
 	text-decoration: none;
 	color: black;
 }
-#startlinks > li > a:hover{
+#startlinks > li > a:hover, #managelinks > li > a:hover{
 	text-decoration: underline;
 }
 #set_num_filter{
@@ -119,7 +135,7 @@ div#progressbar{
 	text-decoration: underline;
 }
 
-#plans_list > table{
+#plans_list > table, #previous_fetches > table{
 	width: 100%;
 }
 
@@ -132,7 +148,7 @@ div#progressbar{
 }
 
 #plans_list td{
-	border: 1px solid transparent;
+	border: 1px solid #eeeefa;
 } 
 
 #plans_list td.plan-handler:hover{
@@ -428,31 +444,21 @@ div.pure-u-1.projectvars{
     max-width:500px;
 }
 
-
-
-/* DT overrides */
 #dt_table tr > th{
     text-align: left;
 }
-
-#dt_table td.islink{
-   /* cursor:pointer; */ 
-}
-
 
 #dt_table td.islink:hover{
     text-decoration:underline;  
 }
 
 #dt_table td.islink > div.editspot{
-	/* not positioned quite right, so over-ride here */
 	background-position-y: 3px;
 }
 
 #dt_table td:nth-of-type(1),#dt_table td:nth-of-type(2){
     cursor:default;
 }
-
 
 #tabs-1 input{
     width:100%;
@@ -668,10 +674,6 @@ table.dataTable tbody tr.odd{
 
 table.dataTable tbody tr.even{
 	background-color:#eee;
-}
-
-th{
-	text-align:left;
 }
 
 span.link{

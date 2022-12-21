@@ -2,44 +2,41 @@
 <html>
     <head>
         <title>LEGO plans downloader</title>
+        <link rel="shortcut icon" type="image/png" href="/static/images/favicon.png"/>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!--        <link href="/static/css/fonts.css" rel="stylesheet" type="text/css"/>-->
         <link href="/static/js/libs/pure/base.css" rel="stylesheet" type="text/css"/>
         <link href="/static/js/libs/pure/grids-core.css" rel="stylesheet" type="text/css"/>
         <link href="/static/js/libs/pure/grids-units.css" rel="stylesheet" type="text/css"/>
-        <link href="/static/js/libs/jqueryui/jquery-ui.css" rel="stylesheet" type="text/css"/>
-        <link href="/static/js/libs/jqueryui/jquery-ui.structure.css" rel="stylesheet" type="text/css"/>
-        <link href="/static/js/libs/jqueryui/jquery-ui.theme.css" rel="stylesheet" type="text/css"/>
-        <link href="/static/js/libs/datatables/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css"/>
         <link href="/static/css/styles.css" rel="stylesheet" type="text/css"/>
-        
-        <link rel="icon" type="image/ico" href="/static/favicon.ico" />
         <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
     </head>
-    <body>
-      
-        <div class="wrapper">
-            <div class="pure-g">
-                <div class="pure-u-2-3">
-                    <h1>Manage LEGO plans</h1>
-                </div>
-            </div>
-            
-            <div class="pure-g">
-                <div class="pure-u-1">
-     				<ul>
-     					<li><a href='/' title='Home'>Home</a>  </li>
-<!--      					<li><a href='/listplans' title='list plans'>List plans</a>  </li> -->
-<!--      					<li><a href='/listplans_paginated' title='list plans'>List plans (paginated)</a>  </li> -->
-     					<li><a href='/api/loadplans' title='update plans from source'>Load plans from source</a> (may take a while)  </li>
-     				</ul>
-                </div>
+    <body data-page='manage'>
+        <div class="pure-g header">
+            <div class="pure-u-2-3">
+                <h1>Manage LEGO plans</h1>
             </div>
         </div>
-        
-        <div id="ajax-loading" style="display:none">
-            AJAX call in progress. Please wait.
+		<div class="wrapper">            
+		    <div class="pure-g controlbar">
+		        <div class="pure-u-1 centred">
+					<ul id='managelinks'>
+						<li><a href='/' title='Home'>Home</a>  </li>
+						<!-- /api/loadplans -->
+						<li><a href='#' title='update plans from source' id="manage_load_plans">Load plans from source</a> (may take a while)  </li>
+					</ul>
+		       </div>
+		   </div>
+		 
+			<div class="pure-g">
+		   		<div class="pure-u-1" id="manage_content">
+		   		
+		   		</div>
+		   		<!-- maybe paginate this in the future? -->
+				<div class="pure-u-1" id="previous_fetches">
+				
+				</div>
+			</div>
         </div>
 
         <script src="/static/js/libs/jquery/jquery.js" type="text/javascript"></script>
@@ -47,9 +44,5 @@
         <script src="/static/js/libs/jqueryui/jquery-ui.js" type="text/javascript"></script>
         <script src="/static/js/libs/datatables/js/jquery.dataTables.min.js" type="text/javascript"></script>
         <script src="/static/js/engine.js" type="text/javascript"></script>
-        <script>
-            //engine.init();
-        </script>
-        
     </body>
 </html>
