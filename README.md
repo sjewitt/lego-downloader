@@ -1,12 +1,35 @@
-# LEGO Plans Downloader:
-Python web application for Lego plans downloading. Comprised of a user inteface running under cherrypy and a fetcher running from a looping shell file driving a command-line python script.
+# LEGO Plans Downloader
 
-The UI provides the option to build a local cache of all plan links listed at https://brickset.com/exportscripts/instructions. This is the 'Load plans from source' link.
+## Summary
+A python3 web application for LEGO plans downloading. Comprised of a user inteface running under cherrypy and a fetcher running from a looping shell file driving a command-line python script.
 
-![Start screen](https://github.com/sjewitt/lego-downloader/blob/master/static/lego-1.png)
+The default view shows the curently retrieved list of LEGO plans that have not been retrieved. The following image shows an already populated list:
 
+![image](https://user-images.githubusercontent.com/6630247/209150648-5fe10832-b5c8-4208-89a0-d2f84c2db4dd.png)
 *LEGO Plans downloader - Start screen*
 
+## Pre-requisites
+The requirements are 
+ - python3
+ - MongoDB
+
+### Python3
+Make sure the platform has python3 deployed.
+
+ - https://www.python.org/downloads/
+ 
+You will need the cherrypy and pymongo modules and any dependencies (I'll probably make a PIPENV at some point for dependency management.)
+
+### MongoDB
+The back-end storage is the MongoDB database:
+
+ - https://www.mongodb.com/try/download/community
+ 
+This is the free edition. Note that the default installation only allows local client connections. Make sure that if you want to use a network accessible deployment, you set the MongoDB config appropriately. 
+
+## Set up
+
+The UI provides the option to build a local cache of all plan links listed at https://brickset.com/exportscripts/instructions. This is the 'Load plans from source' link.
 
 The UI also allows browsing of this cached view via the 'List plans' link. 
 
