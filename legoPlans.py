@@ -1,14 +1,18 @@
 ''' REST API server for LEGO plans application. It uses a Mongo database instance
 directly as a property, rather than an abstracted database codebase. '''
-from pymongo import MongoClient
-import gridfs
+
 import csv
 from io import StringIO
-
+from datetime import datetime
 from urllib import request
+import gridfs
+import pymongo
+from pymongo import MongoClient
+import cherrypy
+
 from mako.lookup import TemplateLookup
 lookup = TemplateLookup(directories=['templates'], output_encoding='utf-8', encoding_errors='replace')
-import cherrypy
+
 
 class LegoPlans():
     ''' Simple REST-based utility to list and download Lego plans using the API at https://brickset.com/exportscripts/instructions.
@@ -17,14 +21,15 @@ class LegoPlans():
     planData = []
     planDataLoaded = False
     plansDB = None
-    LegoPlansDB = None   
+    LegoPlansDB = None
     page_length = 50
     set_filter = None
 
     def __init__(self,db_server, db_port,collection):
+        ''' initialiser '''
         print('bootstrapping API...')
         self.LegoPlansDB = MongoClient(db_server, db_port)[collection]
-    
+
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def index(self):
@@ -41,16 +46,23 @@ class LegoPlans():
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def loadplans(self):    
+    def previous_fetches(self):
+        ''' return the log of previous fetches from source '''
+        return list(self.LegoPlansDB['SourceDownloadRecord'].find({},{'_id':False}).sort('timestamp',pymongo.DESCENDING))
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def loadplans(self):
         ''' Read the CSV at source URL, cache as dict/in MongoDB, return boolean loaded status
         This refreshes the download queue from the source '''
+        now = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
         with request.urlopen(self._sourceUrl) as src_data:
+            _out = {'timestamp':now,'status':'ok','message':'ok', 'error_count':0, 'errors':[], 'data':{'num_added':0, 'num_processed':0,'new_entries':[]}}
             _content = src_data.read().decode()
             # https://stackoverflow.com/questions/47741235/how-to-read-bytes-object-from-csv
             _f = StringIO(_content)
             csv_reader = csv.reader(_f,delimiter=",")
             header_is_read = False
-            _debug = {}
             for _row in csv_reader:
                 if not header_is_read:
                     _headers = _row # = ['SetNumber', 'URL', 'Description', 'DateAdded', 'DateModified']
@@ -58,134 +70,134 @@ class LegoPlans():
                 else:  # first row is headers, used as field names
                     try:
                         if len(_row) >= 5 and _row[1]:
-                            _rowData = {
+                            row_data = {
                                 _headers[0]:_row[0],   # SetNumber
-                                _headers[1]:_row[1],   # URL  
+                                _headers[1]:_row[1],   # URL
                                 _headers[2]:_row[2],   # Description
                                 _headers[3]:_row[3],   # DateAdded
                                 _headers[4]:_row[4],   # DateModified
                                 'key':_row[1].split('/')[-1].split('.pdf')[0]  # filename minus extension
                             }
-                            # # debug
-                            # if _row[1].split('/')[-1].split('.')[0] in _debug:
-                            #     _debug[_row[1].split('/')[-1].split('.')[0]] += 1
-                            # else:
-                            #     _debug[_row[1].split('/')[-1].split('.')[0]] = 1
-                            #
-                            # if _row[2] == '71247_X_Enchanted Car':
-                            #     pass       #71247_X_Enchanted Car
-                            
-                            self.planData.append(_rowData)  #this may not be needed if I properly paginate
-                            
-                            ''' Need to insert specific rows, otherwise I will replace all the downloaded flags... '''
-                            self.LegoPlansDB['DownloadQueue'].update_one({'SetNumber':_rowData.get('SetNumber',None),'URL':_rowData.get('URL',None)},
+
+                            self.planData.append(row_data)
+
+                            # Need to insert specific rows, otherwise I will replace all the downloaded flags...
+                            result = self.LegoPlansDB['DownloadQueue'].update_one({'SetNumber':row_data.get('SetNumber',None),'URL':row_data.get('URL',None)},
                                 {
                                     '$set':{
-                                        'SetNumber':_rowData.get('SetNumber',None),
-                                        'URL':_rowData.get('URL',None),
-                                        'Description':_rowData.get('Description',None),
-                                        'DateAdded':_rowData.get('DateAdded',None),
-                                        'DateModified':_rowData.get('DateModified',None),  #From source
-                                        'DateStoredLocally':'yyyy-mm-dd',            #TODO
-                                        'key':_rowData.get('key',None) # filename minus extension
-                                }}, 
+                                        'SetNumber':row_data.get('SetNumber',None),
+                                        'URL':row_data.get('URL',None),
+                                        'Description':row_data.get('Description',None),
+                                        'DateAdded':row_data.get('DateAdded',None),
+                                        'DateModified':row_data.get('DateModified',None),  #From source
+                                        'DateStoredLocally': now,
+                                        'key':row_data.get('key',None) # filename minus extension
+                                }},
                                 upsert=True)
+                            _out['data']['num_processed'] += 1
+                            if not result.raw_result['updatedExisting']:
+                                _out['data']['num_added'] += 1
+                                _out['data']['new_entries'].append(row_data)
                         else:
                             pass
                     except IndexError as err:
-                        print(str(err))
+                        _out['error_count'] += 1
+                        _out['errors'].append({'error':str(err),'entry':row_data})  #this entry is the CSV row (a list, therefore)
+                        _out['status'] = 'warning'
+                    except Exception as err:
+                        _out['error_count'] += 1
+                        _out['errors'].append({'error':str(err),'entry':row_data})
+                        _out['status'] = 'warning'
 
-            self.planDataLoaded = True  
-            
-            # for thing in _debug:
-            #     if _debug[thing] > 1:
-            #         print(thing, _debug[thing])
- 
-        return(self.plansloaded())
-    
+            self.planDataLoaded = True
+
+        # return(self.plansloaded())
+        self.LegoPlansDB['SourceDownloadRecord'].insert_one(_out)
+        del _out['_id']
+        return _out
+
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def unloadplans(self):
         ''' clear the cached plans '''
         self.planData = []
         self.planDataLoaded = False
-        return(self.plansloaded())
-        
-    
+        return self.plansloaded()
+
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def plansloaded(self):
         ''' return boolean of whether thans are loaded or not '''
-        return({'planDataLoaded':self.planDataLoaded})
-    
+        return {'planDataLoaded':self.planDataLoaded}
+
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def flagdownload(self,**kwargs):
         ''' flag an entry for processing by fetcher '''
         _out = {}
-        if kwargs!= None and 'setnumber' in kwargs and 'flag' in kwargs:
+        if kwargs is not None and 'setnumber' in kwargs and 'flag' in kwargs:
             print('setting download flag ' + kwargs['flag'])
             _flag = False
             if kwargs['flag'] == 'true':
                 _flag = True
             #TODO: Test for file already in the gridFS:
-            _downloaded = False
-            _downloadedCount = list(self.LegoPlansDB['fs.files'].find({'filename':kwargs['setnumber'] + '.pdf'}))
-            if _downloadedCount:
-                _downloaded = True
+            is_downloaded = False
+            downloaded_count = list(self.LegoPlansDB['fs.files'].find({'filename':kwargs['setnumber'] + '.pdf'}))
+            if downloaded_count:
+                is_downloaded = True
                 _flag = False    #we don't need to download it again
-            
-            self.LegoPlansDB['DownloadQueue'].update_one({'key':kwargs['setnumber']},{"$set":{"download": _flag,'downloaded':_downloaded}},upsert=True)
-            _out = {"download": _flag,'downloaded':_downloaded}
-        return(_out)
-            
+
+            self.LegoPlansDB['DownloadQueue'].update_one({'key':kwargs['setnumber']},{"$set":{"download": _flag,'downloaded':is_downloaded}},upsert=True)
+            _out = {"download": _flag,'downloaded':is_downloaded}
+        return _out
+
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def getplandata(self,**kwargs):
-        '''  Also need to have option for flagged as download but not downloaded. This state will exist briefly while downloading, but before 
+        '''  Also need to have option for flagged as download but not downloaded. This state will exist briefly while downloading, but before
         insertion into mongo. Also, will indicate if the fetcher has failed. '''
-        _out = list()
+        _out = []
         self.planData = list(self.LegoPlansDB['DownloadQueue'].find({},{'_id':0}))
-        if kwargs!= None and 'show' in kwargs and kwargs['show'] == 'all':
+        if kwargs is not None and 'show' in kwargs and kwargs['show'] == 'all':
             _out = self.planData
 
         #get specific plan data:
-        elif kwargs!= None and 'setnumber' in kwargs:
+        elif kwargs is not None and 'setnumber' in kwargs:
             for plan in self.planData:
                 if kwargs['setnumber'] == plan['SetNumber']:
                     _out.append(plan)
 
         #get stored plan data:
-        elif kwargs!= None and 'show' in kwargs and kwargs['show'] == 'stored':
+        elif kwargs is not None and 'show' in kwargs and kwargs['show'] == 'stored':
             for plan in self.planData:
-                if 'downloaded' in plan and plan['downloaded'] == True:
+                if 'downloaded' in plan and plan['downloaded'] is True:
                     _out.append(plan)
 
         #get stored plan data:
-        elif kwargs!= None and 'show' in kwargs and kwargs['show'] == 'notstored':
+        elif kwargs is not None and 'show' in kwargs and kwargs['show'] == 'notstored':
 
             for plan in self.planData:
-                if ('downloaded' in plan and plan['downloaded'] == False) or not 'downloaded' in plan:
+                if ('downloaded' in plan and plan['downloaded'] is False) or not 'downloaded' in plan:
                     _out.append(plan)
 
         #get stored plan data:
-        elif kwargs!= None and 'show' in kwargs and kwargs['show'] == 'pending':
+        elif kwargs is not None and 'show' in kwargs and kwargs['show'] == 'pending':
             for plan in self.planData:
-                if ('download' in plan and plan['download'] == True) and not plan['downloaded']:
+                if ('download' in plan and plan['download'] is True) and not plan['downloaded']:
                     _out.append(plan)
 
-        elif kwargs!= None and 'filter' in kwargs:
+        elif kwargs is not None and 'filter' in kwargs:
             for plan in self.planData:
                 if kwargs['filter'].lower() in plan['Notes'].lower() or kwargs['filter'].lower() in plan['Description'].lower():
                     _out.append(plan)
-        return(_out)
+        return _out
 
     @cherrypy.expose
     def getstoredplan(self,**kwargs):
+        ''' retrieve a PDF binary stored inh gridFS '''
+        if kwargs is not None and 'getlocal' in kwargs:
 
-        if kwargs!= None and 'getlocal' in kwargs:
-            
-            ''' get GUID by filename: '''
+            # get GUID by filename:
             _id = self.LegoPlansDB['fs.files'].find_one({'filename':kwargs['getlocal']},{'_id':1})
             if _id is not None:
                 cherrypy.response.headers['Content-Type'] = 'application/pdf'
@@ -195,11 +207,9 @@ class LegoPlans():
                     cherrypy.response.headers['Content-Disposition'] = 'inline; filename="' + kwargs['getlocal'] + '"'
                 fs = gridfs.GridFS(self.LegoPlansDB)
                 _file = fs.get(_id['_id'])
-                return(_file)
-            else:
-                return('No matching file')
-        else:
-            return('No filename in parameter')
+                return _file
+            return 'No matching file'
+        return 'No filename in parameter'
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -221,50 +231,51 @@ class LegoPlans():
             json_in = cherrypy.request.json
             self.LegoPlansDB['DownloadQueue'].update_one({'key':json_in['key']},{'$set':{'download':True,'downloaded':False}})
             return{'msg':'download status reset','status':'ok'}
-            
-            #update cached data for UI as well:
-            for plan in self.planData:
-                if plan['key'] == json_in['key']:
-                    plan['downloaded'] = False
-        else:
-            return({'msg':'Nothing to do...','status':'ok'})
-    
+
+        return {'msg':'Nothing to do...','status':'ok'}
+
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def default(self):
-        return({ 'message':'endpoint not found' })
+        ''' handle unknown endpoint '''
+        return { 'message':'endpoint not found' }
 
-    def stripThing(self,thing,thingToStrip):
-        return(thing.replace(thingToStrip,''))
-    
+    def strip_thing(self,thing,thing_to_strip):
+        ''' utility to strip character x from string y '''
+        return thing.replace(thing_to_strip,'')
+
     # NEW MODEL, SERVER-SIDE PAGINATION
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def set_page_length(self, **kwargs):
+        ''' set the UI page length '''
         self.page_length = int(kwargs.get('page_length',50))
         return {'status':'ok', 'new_page_length': self.page_length}
-    
+
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def set_set_filter(self, **kwargs):
+        ''' set a string filter for set number '''
         self.set_filter = kwargs.get('set_filter',None)
         return {'status':'ok', 'new_set_filter': self.set_filter}
-    
+
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def get_page_length(self):
+        ''' return page length, for pagination object '''
         return {'status':'ok', 'page_length': self.page_length}
-    
+
     @cherrypy.expose
-    @cherrypy.tools.json_out()    
+    @cherrypy.tools.json_out()
     def get_set_filter(self):
+        ''' return the current set number filter '''
         return {'status':'ok', 'set_filter': self.set_filter}
-    
+
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def paginated_plandata(self,**kwargs):
-        
-        curr_page = int(kwargs.get('page_num',1));
+        ''' get specified page of plans, filtered as apprpriate '''
+        curr_page = int(kwargs.get('page_num',1))
         # page_length = int(kwargs.get('page_length',self.page_length))
         page_length = self.page_length
         filter_key = kwargs.get('filter','')
@@ -287,15 +298,14 @@ class LegoPlans():
         paged_data = {
             'pagination_data':{
                 'total':total,
-                'curr_page':curr_page,  
+                'curr_page':curr_page,
                 'page_length':page_length,
                 'filter_key':filter_key,
                 'set_filter' : self.get_set_filter()['set_filter']
                 },
             'entries':entries}
         return paged_data
-    
+
     def filtered_count_plandata(self,count_filter={}):
         ''' return a filtered count of matching documents '''
         return self.LegoPlansDB['DownloadQueue'].count_documents(count_filter)
-

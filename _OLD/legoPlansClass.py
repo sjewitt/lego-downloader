@@ -114,8 +114,8 @@ class LegoPlans():
     
 
 
-    def stripThing(self,thing,thingToStrip):
-        return(thing.replace(thingToStrip,''))
+    def strip_thing(self,thing,thing_to_strip):
+        return(thing.replace(thing_to_strip,''))
 
 class LegoPlansUI():
     def __init__(self):

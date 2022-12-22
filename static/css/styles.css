@@ -109,6 +109,15 @@ div#progressbar{
 	width: 50px;
 }
 
+#manage_content > div{
+	text-transform: uppercase;
+    font-size: 18pt;
+}
+
+#manage_content > div > img{
+	width: 30px;
+    padding-left: 10px;
+}
 #paginator > ul{
  	padding: 0px;
     margin: 0px;

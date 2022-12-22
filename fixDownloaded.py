@@ -15,4 +15,3 @@ for download in downloaded:
     print(download['filename'].split('.')[0])
     #update queue:
     LegoPlansDB['DownloadQueue'].update({'key':download['filename'].split('.')[0]},{'$set':{'download':True,'downloaded':True}})
-

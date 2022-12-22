@@ -1,46 +1,113 @@
 var engine = {
 
 	plandata : null,
-    init : function(){
-		/** we want to set the default, or currently selected, page length back to the dropdown as well as apply the click handler if we
-		want to reset it...*/
-		this.setCurrentPageLength();
-		this.setPageLengthButtonHandler();
-		this.setJumpToPageButtonHandler();
-    	//NOTE The plans are loaded into mongo as a separate process
-    	if($('#plans_list').length){
-    		/*
-    		 * use 
-    		 *     engine.getplandata({'show':nnnnnn});
-    		 * for getting a set directly from source
-    		 */
-    		 
-    		 /** paginated endpoints */
-    		 $('#startlinks > li').each(function(){
-				$(this).on('click',function(){
-//					engine.getplandata_paginated({'page_length':engine.page_length, 'filter': $(this).attr('data-action')});
-					engine.getplandata_paginated({'filter': $(this).attr('data-action')});
-					engine.toggleMenuHighlight(this);
-				});
-			 });
-			 $('#startlinks > li.active').click();
-			 
-			 /** add handler to set # filter */
-			 //document.getElementById('set_num_filter').addEventListener('blur',function(){
-			document.getElementById('set_num_filter').addEventListener('keyup',function(){
-				//if(this.value.length >2){
-					console.log(this.value);
-					fetch('/api/set_set_filter?set_filter=' + this.value)
-						.then((response) => response.json())
-						.then(function(data){
-							/** find the highlighted menu, and click that */
-							document.querySelector('#startlinks > li.active').click();
+    init : function(page){
+		console.log('in init')
+		switch(page){
+			case 'index':
+				/** we want to set the default, or currently selected, page length back to the dropdown as well as apply the click handler if we
+				want to reset it...*/
+				this.setCurrentPageLength();
+				this.setPageLengthButtonHandler();
+				this.setJumpToPageButtonHandler();
+		    	//NOTE The plans are loaded into mongo as a separate process
+		    	if($('#plans_list').length){
+		    		 /** paginated endpoints */
+		    		 $('#startlinks > li').each(function(){
+						$(this).on('click',function(){
+							engine.getplandata_paginated({'filter': $(this).attr('data-action')});
+							engine.toggleMenuHighlight(this);
 						});
-				//}
-			});
-    	}
+					 });
+					 $('#startlinks > li.active').click();
+					 
+					 /** add handler to set # filter */
+					document.getElementById('set_num_filter').addEventListener('keyup',function(){
+						fetch('/api/set_set_filter?set_filter=' + this.value)
+							.then((response) => response.json())
+							.then(function(data){
+								/** find the highlighted menu, and click that */
+								document.querySelector('#startlinks > li.active').click();
+							});
+					});
+		    	}
+			break;
+
+			case 'manage':
+				/** load handlers for manage page */
+				this.getPreviousFetches('previous_fetches');
+				$('#managelinks > li')
+					.each(function(){
+						$(this).on('click',function(){
+							engine.toggleMenuHighlight(this);
+						});
+					 });
+		    	document.getElementById('manage_load_plans').addEventListener('click',function(){
+					engine.loadplans();
+				});			
+			break;
+
+			default:
+		}
     },
 
+	getPreviousFetches : function(target_id){
+		let previous_fetches = document.getElementById(target_id);
+		
+		fetch('/api/previous_fetches')
+			.then((response) => response.json())
+			.then(function(data){
+				/** find the highlighted menu, and click that */
+				console.log(data);
+				let _table = engine.getDOMElement('table',[]);
+				let _thead = engine.getDOMElement('thead',[]);
+				let _tfoot = engine.getDOMElement('tfoot',[]);
+				let _tr = engine.getDOMElement('tr',[]);
+				let _th1 = engine.getDOMElement('th',[]);
+				let _th2 = engine.getDOMElement('th',[]);
+				let _th3 = engine.getDOMElement('th',[]);
+				let _th4 = engine.getDOMElement('th',[]);
+				
+				_th1.appendChild(document.createTextNode('Timestamp'));
+				_th2.appendChild(document.createTextNode('Total processed'));
+				_th3.appendChild(document.createTextNode('Total added'));
+				_th4.appendChild(document.createTextNode('Error count'));
+				
+				_tr.appendChild(_th1);
+				_tr.appendChild(_th2);
+				_tr.appendChild(_th3);
+				_tr.appendChild(_th4);
+				
+				_thead.appendChild(_tr);
+				_tfoot.appendChild(_tr.cloneNode(true));	//see https://developer.mozilla.org/en-US/docs/Web/API/Node/cloneNode
+				
+				let _tbody = engine.getDOMElement('tbody',[]);
+				for(entry of data){
+					let _tr = engine.getDOMElement('tr',[]);
+					/** basic output */
+					let _td1 = engine.getDOMElement('td',[]);
+					let _td2 = engine.getDOMElement('td',[]);
+					let _td3 = engine.getDOMElement('td',[]);
+					let _td4 = engine.getDOMElement('td',[]);
+					
+					_td1.appendChild(document.createTextNode(entry['timestamp']));
+					_td2.appendChild(document.createTextNode(entry['data']['num_processed']));
+					_td3.appendChild(document.createTextNode(entry['data']['num_added']));
+					_td4.appendChild(document.createTextNode(entry['error_count']));
+					
+					_tr.appendChild(_td1);
+					_tr.appendChild(_td2);
+					_tr.appendChild(_td3);
+					_tr.appendChild(_td4);
+					_tbody.appendChild(_tr);
+				}
+				_table.appendChild(_thead);
+				_table.appendChild(_tbody);
+				_table.appendChild(_tfoot);
+				previous_fetches.innerHTML = '';
+				previous_fetches.appendChild(_table);
+			});
+	},
     
     setPageLengthButtonHandler : function(){
 		let set_page_length = document.getElementById('set_page_length_btn');
@@ -112,8 +179,31 @@ var engine = {
         });
     },
     
+    loadplans : function(){
+		let progress = document.getElementById('manage_content');
+		let _pending = this.getDOMElement('div',[]);
+		let _spinner = this.getDOMElement('img',[{'attr':'src','val':'/static/images/load-loading.gif'}]);
+		_pending.appendChild(_spinner);
+		_pending.appendChild(document.createTextNode('retrieving...'));
+		progress.appendChild(_pending);
+		fetch('/api/loadplans')
+			.then(function(response){
+				return(response.json());
+			})
+			.then(function(data){
+				console.log(data);
+				/** process return data to database (so we have a record of each update) and process display */
+				progress.innerHTML = '';
+				let _done = engine.getDOMElement('div',[]);
+				_done.appendChild(document.createTextNode('Done!'));
+				console.log('finished appending done message');
+				progress.appendChild(_done);
+				engine.getPreviousFetches('previous_fetches');
+			})
+	},
+    
     //Load the plans into memory
-    loadplans : function(filterObj){
+    loadplansXXXX : function(filterObj){
     	
     	$.ajax({
             type: "GET",
@@ -241,9 +331,9 @@ var engine = {
             }
             _out += '</table>';
             $('#plans_list').html(_out);
-            $('#plans_listing').dataTable({
-            	  "pageLength": 50
-            });
+//            $('#plans_listing').dataTable({
+//            	  "pageLength": 50
+//            });
             
             //see SO #30794672 - defer binding so that hidden elements are also flagged:
             $('table').on('click','td.download_checkbox',function(){
@@ -420,16 +510,18 @@ var engine = {
     
     /** function to generate DOM elements */
     getDOMElement :function(elemTypeString,attrsArray){
-		console.log('creating ',elemTypeString, ' elem');
+		//console.log('creating ',elemTypeString, ' elem');
 		let elem = document.createElement(elemTypeString);
 		for(let a=0;a<attrsArray.length;a++){
-			console.log(attrsArray[a])
+			//console.log(attrsArray[a])
 			elem.setAttribute(attrsArray[a].attr,attrsArray[a].val);
 		}
 		return(elem);
 	}
 
 };
+
+engine.init(document.getElementsByTagName('body')[0].getAttribute('data-page'));
 
 //ajax start/stop for progress icon
 $(document).bind('ajaxStart', function(){
