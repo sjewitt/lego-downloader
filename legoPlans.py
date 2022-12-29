@@ -1,5 +1,11 @@
 ''' REST API server for LEGO plans application. It uses a Mongo database instance
-directly as a property, rather than an abstracted database codebase. '''
+directly as a property, rather than an abstracted database codebase. 
+This URL:
+
+https://www.blue-ocean-ag.com/bi/
+
+gives access to magazine set plans taht are not stand-alone LEGO sets
+'''
 
 import csv
 from io import StringIO
@@ -7,8 +13,10 @@ from datetime import datetime
 from urllib import request
 import gridfs
 import pymongo
+import uuid
 from pymongo import MongoClient
 import cherrypy
+from tempfile import TemporaryFile
 
 from mako.lookup import TemplateLookup
 lookup = TemplateLookup(directories=['templates'], output_encoding='utf-8', encoding_errors='replace')
@@ -236,6 +244,63 @@ class LegoPlans():
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
+    def upload(self,**kwargs):
+        # https://riptutorial.com/cherrypy/example/25395/file-upload-with-cherrypy
+        print(kwargs)
+        # in_data=cherrypy.request
+        print('debug')
+        uploaded_set_number = kwargs.get('uploaded_set_number',None)
+        uploaded_set_description = kwargs.get('uploaded_set_description',None)
+        uploaded_set_notes = kwargs.get('uploaded_set_notes','-')
+        uploaded_file = kwargs.get('uploaded_set_file',None)
+        file_name = uploaded_file.filename
+        # Process uploaded file data, and send to save function:
+        key = uuid.uuid4()
+        size = 0
+        # need temp file here because I am not writing to FS:
+        with TemporaryFile() as tmp:
+            while True:
+                file_data = uploaded_file.file.read(8192)
+                if not file_data:
+                    break
+                tmp.write(file_data)
+                size+=len(file_data)
+        
+            grid_fs = gridfs.GridFS(self.LegoPlansDB)
+            # get raw file data here:
+            tmp.seek(0)
+            grid_fs.put(tmp.read(),filename=''.join([str(key),'.pdf']))
+            print(key)
+        
+        # will need to do this - transaction: actually can't - need cluster or sharded deployment...
+        # https://www.mongodb.com/docs/upcoming/core/transactions/?_ga=2.30935807.1188859118.1672320290-238380667.1654968213
+        # step 1: insert metadata, as fif it was a standard queued job
+        date_now = "DATE TODO"
+        
+        print(key)
+        result = self.LegoPlansDB['DownloadQueue'].update_one({'SetNumber':uploaded_set_number,'URL':None},
+        {
+            '$set':{
+                'SetNumber' : uploaded_set_number,
+                'URL' : 'Manual upload',
+                'Description' : uploaded_set_description,
+                'Notes' : uploaded_set_notes,
+                'DateAdded' : date_now,
+                'DateModified' : date_now,  #From source
+                'DateStoredLocally' : date_now,
+                'key' : str(key),                # a UUID for manual upload
+                #'key' : file_name,
+                'download':True,            # Need these to properly show in the UI
+                'downloaded':True           # Need these to properly show in the UI
+        }},
+        upsert=True)
+        print(result)
+        
+        # TODO: Check form submission, and redirect to uploaded view if OK, or present a message if error:
+        raise cherrypy.HTTPRedirect('/?filter=stored')
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
     def default(self):
         ''' handle unknown endpoint '''
         return { 'message':'endpoint not found' }
@@ -309,3 +374,4 @@ class LegoPlans():
     def filtered_count_plandata(self,count_filter={}):
         ''' return a filtered count of matching documents '''
         return self.LegoPlansDB['DownloadQueue'].count_documents(count_filter)
+
