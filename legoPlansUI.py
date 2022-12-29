@@ -10,7 +10,7 @@ class LegoPlansUI():
         print('bootstrapping UI...')
 
     @cherrypy.expose
-    def default(self):
+    def index(self,**kwargs):
         ''' render start page '''
         tmpl = lookup.get_template("index.html")
         return tmpl.render()
@@ -20,6 +20,12 @@ class LegoPlansUI():
         ''' render manage page '''
         tmpl = lookup.get_template("manage.html")
         return tmpl.render()
+    
+    @cherrypy.expose
+    def upload(self):
+        ''' render upload page '''
+        tmpl = lookup.get_template("upload.html")
+        return tmpl.render()    
 
     # @cherrypy.expose
     # def listplans(self):

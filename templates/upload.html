@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Upload a LEGO plan</title>
+        <link rel="shortcut icon" type="image/png" href="/static/images/favicon.png"/>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="/static/js/libs/pure/base.css" rel="stylesheet" type="text/css"/>
+        <link href="/static/js/libs/pure/grids-core.css" rel="stylesheet" type="text/css"/>
+        <link href="/static/js/libs/pure/grids-units.css" rel="stylesheet" type="text/css"/>
+        <link href="/static/js/libs/pure/forms.css" rel="stylesheet" type="text/css"/>
+        <link href="/static/css/styles.css" rel="stylesheet" type="text/css"/>
+        <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+    </head>
+    <body data-page='upload'>
+        <div class="pure-g header">
+            <div class="pure-u-2-3">
+                <h1>Upload a LEGO plan</h1>
+            </div>
+        </div>
+		<div class="wrapper">            
+		    <div class="pure-g controlbar">
+		        <div class="pure-u-1 centred">
+					<ul id='uploadlinks'>
+						<li><a href='/' title='Home'>Home</a>  </li>
+						<li><a href='/manage'>[Manage]</a></li><!-- show all  -->
+					</ul>
+		       </div>
+		   </div>
+		   <div class="pure-g">
+		   		<div class="pure-u-1">
+		   			<h2>Upload a LEGO plan</h2>
+		   		</div>
+		   </div>
+		  <!-- https://riptutorial.com/cherrypy/example/25395/file-upload-with-cherrypy
+		  https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#:~:text=Acceptable%20file%20types%20can%20be,Accept%20PNG%20or%20JPEG%20files.
+		  https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications
+		  etc...
+		   -->
+		   <form action = "/api/upload" method = "POST" 
+			         enctype = "multipart/form-data" class="pure-form pure-form-aligned">
+			         <fieldset>
+			         <!-- The back-end will key this plan wih a UUID -->
+				         <div class="pure-control-group">
+				         	<label for="uploaded_set_number">Set</label>
+				         	<input type="text" id="uploaded_set_number" name="uploaded_set_number" value="" placeholder="Set number">
+				         	<span class="pure-form-message-inline">Set number, magazine # etc.</span>
+				         </div>
+			         	<div class="pure-control-group">
+				         	<label for="uploaded_set_description">Description</label>
+				         	<input type="text" id="uploaded_set_description" name="uploaded_set_description" value="" placeholder="Set description">
+				         	<span class="pure-form-message-inline">Description of this set</span>
+				         </div>
+				         <div class="pure-control-group">
+				         	<label for="uploaded_set_notes">Notes</label>
+				         	<input type="text" id="uploaded_set_notes" name="uploaded_set_notes" value="" placeholder="Set notes">
+				         	<span class="pure-form-message-inline">Additional notes</span>
+				         </div>
+				         <div class="pure-control-group">
+				         	<label for="uploaded_set_file">Plan File</label>
+				         	<input id="uploaded_set_notes" type = "file" name="uploaded_set_file" accept=".pdf"/>
+				         </div>
+			         
+				         <div class="pure-controls">
+				         	<button  class="pure-button pure-button-primary" type="submit">Upload</button>
+				         </div>
+			         </fieldset>
+			      </form>
+			<div class="pure-g">
+		   		<div class="pure-u-1" id="upload_content">
+			      
+		   		</div>
+			</div>
+        </div>
+
+        <script src="/static/js/libs/jquery/jquery.js" type="text/javascript"></script>
+        <script src="/static/js/libs/jquery/jquery.cookie.js" type="text/javascript"></script>
+        <script src="/static/js/libs/jqueryui/jquery-ui.js" type="text/javascript"></script>
+        <script src="/static/js/libs/datatables/js/jquery.dataTables.min.js" type="text/javascript"></script>
+        <script src="/static/js/engine.js" type="text/javascript"></script>
+    </body>
+</html>

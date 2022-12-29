@@ -75,11 +75,11 @@ div#filters > select{
 div#progressbar{
     display:none;
 }
-#startlinks,#managelinks{
+#startlinks,#managelinks,#uploadlinks{
 	width: 100%;
     padding-inline-start: 0px;
 }
-#startlinks > li,#managelinks > li{
+#startlinks > li,#managelinks > li,#uploadlinks > li{
 	display: inline-block;
 	text-align: center;
 	text-transform: uppercase;
@@ -87,22 +87,25 @@ div#progressbar{
 	border-right: 3px solid white;
 }
 #startlinks > li{
-	width: 17%;
+	width: 18%;
 }
 #managelinks > li{
+	width: 31%;
+}
+#uploadlinks > li{
 	width: 48%;
 }
 
-#startlinks > li.active,#managelinks > li.active{
+#startlinks > li.active,#managelinks > li.active, #uploadlinks > li.active{
 	font-weight: bold;
 	border-left: 3px solid black;
 	border-right: 3px solid black;
 }
-#startlinks > li > a,#managelinks > li > a{
+#startlinks > li > a,#managelinks > li > a,#uploadlinks > li > a{
 	text-decoration: none;
 	color: black;
 }
-#startlinks > li > a:hover, #managelinks > li > a:hover{
+#startlinks > li > a:hover, #managelinks > li > a:hover, #uploadlinks > li > a:hover{
 	text-decoration: underline;
 }
 #set_num_filter{
