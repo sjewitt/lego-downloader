@@ -2,7 +2,6 @@ var engine = {
 
 	plandata : null,
     init : function(page){
-		console.log('in init')
 		switch(page){
 			case 'index':
 				/** we want to set the default, or currently selected, page length back to the dropdown as well as apply the click handler if we
@@ -30,7 +29,11 @@ var engine = {
 								document.querySelector('#startlinks > li.active').click();
 							});
 					});
-		    	}
+		    	};
+		    	/** have we been sent a URL parameter from - eg a manual upload? */
+				let view = this._getQSVal(document.location.href,'filter');
+				console.log('#startlinks > li[data-action="' + view+ '"]');
+				$('#startlinks > li[data-action="' + view+ '"]').click();
 			break;
 
 			case 'manage':
@@ -58,7 +61,6 @@ var engine = {
 			.then((response) => response.json())
 			.then(function(data){
 				/** find the highlighted menu, and click that */
-				console.log(data);
 				let _table = engine.getDOMElement('table',[]);
 				let _thead = engine.getDOMElement('thead',[]);
 				let _tfoot = engine.getDOMElement('tfoot',[]);
@@ -127,8 +129,7 @@ var engine = {
 		/** get the jump params from the paginator */
 		jump_to_page.addEventListener('click',function(){
 			let page_to_load = document.getElementById('jump_to').value;
-			console.log('jump to page ', page_to_load);
-			
+
 			let params = {};
 			params.page_num = parseInt(page_to_load);
 			engine.getplandata_paginated(params);
@@ -191,12 +192,10 @@ var engine = {
 				return(response.json());
 			})
 			.then(function(data){
-				console.log(data);
 				/** process return data to database (so we have a record of each update) and process display */
 				progress.innerHTML = '';
 				let _done = engine.getDOMElement('div',[]);
 				_done.appendChild(document.createTextNode('Done!'));
-				console.log('finished appending done message');
 				progress.appendChild(_done);
 				engine.getPreviousFetches('previous_fetches');
 			})
@@ -251,7 +250,6 @@ var engine = {
             dataType: 'json',
             url : list_url
         }).done(function(data){
-			console.table(data);
 			/** set the set number filter, if found */
 			let set_filter_elem = document.getElementById('set_num_filter');
 			set_filter_elem.value = "";
@@ -266,7 +264,6 @@ var engine = {
         	//TODO: Exclude items that are flagged as unavailable (i.e. we have alrady tried to get the plan, but we got a response othter than 200OK) 
             for(var a=0;a<engine.planData.entries.length;a++){
             	if(engine.planData.entries[a].SetNumber !== undefined){
-					// console.log(engine.planData.entries[a]);
 	            	var _desc = engine.planData.entries[a].Description;
 	            	if(_desc.length === 0){
 	            		_desc = "[No description]";
@@ -407,7 +404,6 @@ var engine = {
 	},
 	
 	paginationHandler : function(){
-		console.log('in pagination handler...');
 		let args = {
 			page_num:parseInt(this.getAttribute('data-targetpage')),
 			filter:this.getAttribute('data-filter'),
@@ -510,15 +506,12 @@ var engine = {
     
     /** function to generate DOM elements */
     getDOMElement :function(elemTypeString,attrsArray){
-		//console.log('creating ',elemTypeString, ' elem');
 		let elem = document.createElement(elemTypeString);
 		for(let a=0;a<attrsArray.length;a++){
-			//console.log(attrsArray[a])
 			elem.setAttribute(attrsArray[a].attr,attrsArray[a].val);
 		}
 		return(elem);
 	}
-
 };
 
 engine.init(document.getElementsByTagName('body')[0].getAttribute('data-page'));
