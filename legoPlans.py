@@ -297,7 +297,7 @@ class LegoPlans():
         print(result)
         
         # TODO: Check form submission, and redirect to uploaded view if OK, or present a message if error:
-        raise cherrypy.HTTPRedirect('/?filter=stored')
+        raise cherrypy.HTTPRedirect('/?view=stored&key='+str(key))
 
     @cherrypy.expose
     @cherrypy.tools.json_out()

@@ -1,6 +1,9 @@
 var engine = {
-
+	
 	plandata : null,
+	
+	reloaded : false,
+	
     init : function(page){
 		switch(page){
 			case 'index':
@@ -30,10 +33,10 @@ var engine = {
 							});
 					});
 		    	};
-		    	/** have we been sent a URL parameter from - eg a manual upload? */
-				let view = this._getQSVal(document.location.href,'filter');
-				console.log('#startlinks > li[data-action="' + view+ '"]');
-				$('#startlinks > li[data-action="' + view+ '"]').click();
+//		    	/** have we been sent a URL parameter from - eg a manual upload? */
+//				let view = this._getQSVal(document.location.href,'filter');
+//				console.log('#startlinks > li[data-action="' + view+ '"]');
+//				$('#startlinks > li[data-action="' + view+ '"]').click();
 			break;
 
 			case 'manage':
@@ -201,28 +204,6 @@ var engine = {
 			})
 	},
     
-    //Load the plans into memory
-    loadplansXXXX : function(filterObj){
-    	
-    	$.ajax({
-            type: "GET",
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            url : "/api/loadplans"
-        }).done(function(data){
-        	engine.planDataLoaded = data['planDataLoaded'];
-            
-            //load the search/browse form
-            if(engine.planDataLoaded){
-            	engine.getplandata()
-            }
-            
-        }).fail(function(jqxhr, status, e){ 
-            console.log("err"); 
-        }).done(function(){});
-    },
-    
-
     getplandata_paginated : function(params){
     	let curr_page = 1;
     	let filter = 'all';
@@ -323,7 +304,6 @@ var engine = {
 	            	td_setnum.appendChild(document.createTextNode(engine.planData.entries[a].SetNumber));
 	            	span_desc = engine.getDOMElement('span',[]);
 	            	span_desc.appendChild(document.createTextNode(_desc));
-	            	
             	}
             }
             _out += '</table>';
@@ -357,7 +337,34 @@ var engine = {
             //paginator:
             let _paginator_location = document.getElementById('paginator') ;
             _paginator_location.innerHTML = "" 
-            _paginator_location.appendChild(engine.getPaginationLinks(data.pagination_data))  
+            _paginator_location.appendChild(engine.getPaginationLinks(data.pagination_data));
+            
+            /** and do any URL parameter-triggered actions:  */
+             			    /* have we been sent a URL parameter from - eg a manual upload? */
+			let view = engine._getQSVal(document.location.href,'view');
+			console.log(view);
+			//let called = false;
+			if('view'  &&! engine.reloaded){
+				/** check it is a valid parameter value */
+				//if(['stored','notstored','pending','all'].find(view)){	//maybe...
+				switch(view){
+					case 'stored':
+						$('#startlinks > li[data-action="' + view+ '"]').click();
+						engine.reloaded = true; 
+						//document.location.href = document.location.href.split('?')[0];
+						// see SO https://stackoverflow.com/questions/12446317/change-url-without-redirecting-using-javascript
+						//populate the search field:
+						search_field = document.getElementById('set_num_filter');
+						search_field.value = engine._getQSVal(document.location.href,'key');
+						search_field.focus();
+						search_field.blur();
+						//and remove the URL parameter
+						window.history.replaceState(data,'LEGO plans downloader', document.location.href.split('?')[0]);
+						break;
+				}
+			}
+			
+ 
         }).fail(function(jqxhr, status, e){ 
             console.log("err"); 
         });
@@ -434,13 +441,6 @@ var engine = {
         }).done(function(data){ });
     },
     
-    /*
-     * Construct an imput field with the current text:
-     * 
-     * params:
-     * elem: DOM element that was clicked (should be a td)
-     * 
-     */
     getEditField : function(elem){
     	var _out = document.createElement('input');
         _out.setAttribute('type','text');
