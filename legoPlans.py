@@ -25,7 +25,8 @@ lookup = TemplateLookup(directories=['templates'], output_encoding='utf-8', enco
 class LegoPlans():
     ''' Simple REST-based utility to list and download Lego plans using the API at https://brickset.com/exportscripts/instructions.
      - Class exposing JSON rest endpoints for listing Lego plans '''
-    _sourceUrl = 'https://brickset.com/exportscripts/instructions'
+    # _sourceUrl = 'https://brickset.com/exportscripts/instructions'
+    _sourceUrl = "http://localhost:8000/Brickset-instructions.txt"
     planData = []
     planDataLoaded = False
     plansDB = None
@@ -98,7 +99,7 @@ class LegoPlans():
                                         'Description':row_data.get('Description',None),
                                         'DateAdded':row_data.get('DateAdded',None),
                                         'DateModified':row_data.get('DateModified',None),  #From source
-                                        'DateStoredLocally': now,
+                                        'DateStoredLocally': now,   # BUG! This should ONLY update if it is NEW!
                                         'key':row_data.get('key',None) # filename minus extension
                                 }},
                                 upsert=True)

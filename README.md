@@ -56,6 +56,9 @@ The cached view of the 'Stored' plans offers options for downloading, opening or
 
 I didn't want to link directly to the plans on lego.com for HTTP traffic reduction purposes (and my broadband is pretty poor).
 
+## venv
+`source myvenv/bin/activate`
+
 ## Planned updates:
  - Make it a bit prettier...
  - Ability to add unlisted/self scanned plans
