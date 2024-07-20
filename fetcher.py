@@ -4,11 +4,12 @@ import argparse
 from pymongo import MongoClient
 import gridfs
 import requests
+import yaml
 
 
-def start_fetcher(db_server, db_port, collection):
+def start_fetcher(db_server, db_port, db_collection):
     ''' check for and process next unfetched queued plan entry '''
-    legoplans_database = MongoClient(db_server, db_port)[collection]
+    legoplans_database = MongoClient(db_server, db_port)[db_collection]
 
     queue = legoplans_database['DownloadQueue'].find_one({'downloaded': {'$in' : [None,False]},'download':True})
 
@@ -42,5 +43,12 @@ if __name__ == '__main__':
     parser.add_argument('-p','--db_port',default=27017, type=int)
     parser.add_argument('-c','--db_collection',default='LegoPlans')
     args = parser.parse_args()
-
-    start_fetcher(args.db_server, args.db_port, args.db_collection)
+    with(open('settings/config.yaml') as config_file):
+        conf = yaml.safe_load(config_file)
+        print(conf['server'])
+        # start_fetcher(args.db_server, args.db_port, args.db_collection)
+        start_fetcher(
+            db_server=conf['database']['db_server'],
+            db_port=conf['database']['db_port'],
+            db_collection=conf['database']['db_collection'],
+        )

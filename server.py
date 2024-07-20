@@ -6,6 +6,7 @@ Simple REST-based utility to list and download Lego plans using the API at https
 import os
 import argparse
 import cherrypy
+import yaml
 
 
 from legoPlans import LegoPlans
@@ -15,7 +16,7 @@ from legoPlansUI import LegoPlansUI
 def error_page_404(status, message, traceback, version):
     return iter([status, message, traceback, version])
 
-def start_server(server, port, db_server, db_port, collection):
+def start_server(app_server, app_port, db_server, db_port, db_collection):
     root_dir = os.path.abspath( os.path.dirname(__file__))
     conf = {
         '/': {
@@ -31,14 +32,14 @@ def start_server(server, port, db_server, db_port, collection):
 
     cherrypy.config.update({
         'error_page.404': error_page_404,
-        'server.socket_host': server,
-        'server.socket_port': port,
+        'server.socket_host': app_server,
+        'server.socket_port': app_port,
         'tools.mako.directories' : [os.path.join(root_dir,'templates')],    #silas
         })
     cherrypy.engine.start()
 
     #API:
-    cherrypy.tree.mount(LegoPlans(db_server, db_port,collection), '/api/',conf)
+    cherrypy.tree.mount(LegoPlans(db_server, db_port,db_collection), '/api/',conf)
 
     #UI:
     cherrypy.tree.mount(LegoPlansUI(), '/',conf)
@@ -46,6 +47,10 @@ def start_server(server, port, db_server, db_port, collection):
     #And load the plans:
 
 if __name__ == '__main__':
+    with(open('settings/config.yaml') as config_file):
+        conf = yaml.safe_load(config_file)
+        print(conf['server'])
+
     parser = argparse.ArgumentParser()
     parser.add_argument('-a','--app_server',default='127.0.0.1')
     parser.add_argument('-b','--app_port',default=8081, type=int)
@@ -53,5 +58,12 @@ if __name__ == '__main__':
     parser.add_argument('-p','--db_port',default=27017, type=int)
     parser.add_argument('-c','--db_collection',default='LegoPlans')
     args = parser.parse_args()
+    start_server(
+        app_server=conf['server']['app_server'],
+        app_port=conf['server']['app_port'],
+        db_server=conf['database']['db_server'],
+        db_port=conf['database']['db_port'],
+        db_collection=conf['database']['db_collection'],
+    )
 
-    start_server(args.app_server,args.app_port, args.db_server, args.db_port, args.db_collection)
+    # start_server(args.app_server,args.app_port, args.db_server, args.db_port, args.db_collection)

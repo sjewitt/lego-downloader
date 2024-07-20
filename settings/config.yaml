@@ -1,0 +1,7 @@
+server:
+  app_server: localhost
+  app_port: 8081
+database:
+  db_server: 192.168.1.115
+  db_port: 27017
+  db_collection: LegoPlans
