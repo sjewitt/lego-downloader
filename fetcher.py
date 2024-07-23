@@ -1,6 +1,5 @@
 
 ''' fetcher for LEGO plans queue '''
-import argparse
 from pymongo import MongoClient
 import gridfs
 import requests
@@ -38,15 +37,10 @@ def start_fetcher(db_server, db_port, db_collection):
         print('Nothing to do...')
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-d','--db_server',default='localhost')
-    parser.add_argument('-p','--db_port',default=27017, type=int)
-    parser.add_argument('-c','--db_collection',default='LegoPlans')
-    args = parser.parse_args()
+
     with(open('settings/config.yaml') as config_file):
         conf = yaml.safe_load(config_file)
-        print(conf['server'])
-        # start_fetcher(args.db_server, args.db_port, args.db_collection)
+        
         start_fetcher(
             db_server=conf['database']['db_server'],
             db_port=conf['database']['db_port'],

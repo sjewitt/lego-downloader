@@ -4,13 +4,12 @@ Simple REST-based utility to list and download Lego plans using the API at https
  - The CherryPy server start, defining URL roots for REST API and user interface.
 '''
 import os
-import argparse
 import cherrypy
 import yaml
 
 
-from legoPlans import LegoPlans
-from legoPlansUI import LegoPlansUI
+from include.legoPlans import LegoPlans
+from include.legoPlansUI import LegoPlansUI
 # from bson.json_util import default
 
 def error_page_404(status, message, traceback, version):
@@ -44,20 +43,11 @@ def start_server(app_server, app_port, db_server, db_port, db_collection):
     #UI:
     cherrypy.tree.mount(LegoPlansUI(), '/',conf)
 
-    #And load the plans:
-
 if __name__ == '__main__':
     with(open('settings/config.yaml') as config_file):
         conf = yaml.safe_load(config_file)
         print(conf['server'])
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-a','--app_server',default='127.0.0.1')
-    parser.add_argument('-b','--app_port',default=8081, type=int)
-    parser.add_argument('-d','--db_server',default='localhost')
-    parser.add_argument('-p','--db_port',default=27017, type=int)
-    parser.add_argument('-c','--db_collection',default='LegoPlans')
-    args = parser.parse_args()
     start_server(
         app_server=conf['server']['app_server'],
         app_port=conf['server']['app_port'],
@@ -65,5 +55,3 @@ if __name__ == '__main__':
         db_port=conf['database']['db_port'],
         db_collection=conf['database']['db_collection'],
     )
-
-    # start_server(args.app_server,args.app_port, args.db_server, args.db_port, args.db_collection)
