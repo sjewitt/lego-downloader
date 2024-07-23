@@ -5,10 +5,11 @@ bin/
 lib/
 include/__pycache__/
 v2/app.py.bak
-v2/api/__pycache__/
+v2/api/__pycache__
 v2/domain/__pycache__/
 v2/handler/__pycache__/
 v2/handlers/handlers.py.bak
 v2/repository/__pycache__/
 v2/repository/database.py.bak
 v2/repository/mongo.py.bak
+
