@@ -64,14 +64,14 @@ def get_item_data(item_key: str):
     return item_data(item_key)
 
 @app.get("/api/download/{item_key}")
-def get_item_download(item_key: str,download:bool=False):
+def get_item_download(item_key: str):   #,download:bool=False
     res = item_download(item_key)
     if res[0] == "DOWNLOAD":
-        if download:
-            headers = {'Content-Disposition': f'attachment; filename="{item_key}.pdf"'}
-            return Response(content=res[1].read(), headers=headers)
-        return Response(res[1].read(), media_type="application/pdf")
-    return res
+        # if download:
+        headers = {'Content-Disposition': f'attachment; filename="{item_key}.pdf"'}
+        return Response(content=res[1].read(), headers=headers)
+        # return Response(res[1].read(), media_type="application/pdf")
+    # return res
 '''
 END UPDATED API
 '''
